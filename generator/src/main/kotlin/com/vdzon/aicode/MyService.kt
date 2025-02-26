@@ -17,6 +17,10 @@ import java.nio.file.Paths
 data class SourceFiles(val files: List<SourceFile>)
 data class SourceFile(val path: String, val filename: String, val body: String)
 
+//private const val MODEL = "qwen2.5-coder:32b"
+//private const val MODEL = "qwen2.5-coder:7b"
+private const val MODEL = "qwen2.5-coder:14b"
+
 @Service
 class MyService() {
 
@@ -44,7 +48,7 @@ class MyService() {
             Output all files that are needed to create the project, including the pom.xml
         """.trimIndent()
 
-        val request: ChatRequest = ChatRequest.builder("qwen2.5-coder:32b")
+        val request: ChatRequest = ChatRequest.builder(MODEL)
 //        val request: ChatRequest = ChatRequest.builder("codellama:instruct")
             .stream(false)
             .messages(
@@ -85,7 +89,7 @@ class MyService() {
     }
 
     fun saveGeneratedFiles(sourceFiles: SourceFiles) {
-        val basePath = "/Users/robbertvdzon/git/aiCodeGenerator1/generated"
+        val basePath = "generated"
 
         // Zorg ervoor dat de basisfolder bestaat
         Files.createDirectories(Paths.get(basePath))
