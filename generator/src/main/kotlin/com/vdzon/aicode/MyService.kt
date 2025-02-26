@@ -17,9 +17,9 @@ import java.nio.file.Paths
 data class SourceFiles(val files: List<SourceFile>)
 data class SourceFile(val path: String, val filename: String, val body: String)
 
-//private const val MODEL = "qwen2.5-coder:32b"
+private const val MODEL = "qwen2.5-coder:32b"
 //private const val MODEL = "qwen2.5-coder:7b"
-private const val MODEL = "qwen2.5-coder:14b"
+//private const val MODEL = "qwen2.5-coder:14b"
 
 @Service
 class MyService() {
