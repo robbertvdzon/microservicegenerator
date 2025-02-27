@@ -57,7 +57,13 @@ class MyService() {
                         .content(prompt)
                         .build(),
                     Message.builder(Role.USER)
-                        .content("Create a Spring Kotlin project with an endpoint that returns 'Hello World'.  Include a testclass for this project.")
+                        .content("""
+                            Create a Spring Kotlin project with an POST endpoint that can store a username. This username is stored inmemory in a list.
+                            There is also a GET endpoint that returns all stored usernames.
+                            There is also an webpage that is hosted by spring that shows a form to add a username and a list of all stored usernames.
+                            There is also a nice header in the index.html file with an image.
+                            Thymeleaf must be used for the webpage.
+                            """)
                         .build()
                 )
             )
