@@ -22,10 +22,9 @@ private const val MODEL = "qwen2.5-coder:32b"
 //private const val MODEL = "qwen2.5-coder:14b"
 
 @Service
-class MyService() {
+class CodeGeneratorService() {
 
-    @PostConstruct
-    fun askOllamaOnStartup() {
+    fun generateCode() {
         val ollamaApi = OllamaApi()
 
         val ollamaOptions = OllamaOptions()
@@ -86,9 +85,9 @@ class MyService() {
             }
 
             println("Gekregen SourceFiles object:\n$sourceFiles")
-            if (sourceFiles != null) {
-                saveGeneratedFiles(sourceFiles)
-            }
+//            if (sourceFiles != null) {
+//                saveGeneratedFiles(sourceFiles)
+//            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
