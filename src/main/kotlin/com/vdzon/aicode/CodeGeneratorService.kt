@@ -99,7 +99,11 @@ class CodeGeneratorService(
                                 )
                             ```
                             
-                            Can you help me to generate the code for the new feature and improve the code in the feature branch?                            
+                            Can you help me to generate the code for the new feature and improve the code in the feature branch?
+                            Here is the json that contains the main branch and the feature branch:
+                            $requestJson
+                                                        
+                                                        
                             
                             """)
                         .build()
@@ -124,9 +128,9 @@ class CodeGeneratorService(
             }
 
             println("Gekregen SourceFiles object:\n$sourceFiles")
-//            if (sourceFiles != null) {
-//                saveGeneratedFiles(sourceFiles)
-//            }
+            if (sourceFiles != null) {
+                saveGeneratedFiles(sourceFiles)
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }

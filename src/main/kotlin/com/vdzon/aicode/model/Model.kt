@@ -1,8 +1,8 @@
 package com.vdzon.aicode.model
 
 data class Request(
-    val mainBranch: MicroserviceProject,
-    val featureBranch: MicroserviceProject,
+    val mainBranch: MicroserviceProject?,
+    val featureBranch: MicroserviceProject?,
 )
 
 data class MicroserviceProject(

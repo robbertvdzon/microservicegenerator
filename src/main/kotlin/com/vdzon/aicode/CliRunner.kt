@@ -12,7 +12,7 @@ class CliRunner(
     override fun run(args: ApplicationArguments) {
         if (args.sourceArgs.isEmpty()) {
             println("Gebruik: java -jar mijnapp.jar generateCode")
-            System.exit(0)
+//            System.exit(0)
         }
 
         val action = args.sourceArgs.joinToString(" ")

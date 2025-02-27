@@ -6,9 +6,9 @@ import org.springframework.boot.runApplication
 
 
 @SpringBootApplication
-class AicodeApplication
+class Application
 
 fun main(args: Array<String>) {
-    runApplication<AicodeApplication>(*args)
+    runApplication<Application>(*args)
 }
 
