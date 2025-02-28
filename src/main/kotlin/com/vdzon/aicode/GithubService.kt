@@ -12,7 +12,7 @@ import java.io.File
 data class GitHubTree(val tree: List<GitHubFile>)
 data class GitHubFile(val path: String, val type: String, val url: String?)
 
-@Service
+//@Service
 class GithubService() {
 
     fun getSerializedRepo(branch: String): MicroserviceProject? {

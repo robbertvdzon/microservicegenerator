@@ -61,7 +61,7 @@ data class OllamaMessage(
 )
 
 
-@Service
+//@Service
 class CodeGeneratorService(
     val githubService: GithubService
 ) {
