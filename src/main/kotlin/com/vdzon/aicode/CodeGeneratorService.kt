@@ -18,6 +18,10 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 
+private const val MODEL = "qwen2.5-coder:32b"
+//private const val MODEL = "qwen2.5-coder:7b"
+//private const val MODEL = "qwen2.5-coder:14b"
+
 
 // Kotlin Data Classes voor JSON Mapping
 data class OllamaRequest(
@@ -50,9 +54,6 @@ data class OllamaMessage(
     val content: String
 )
 
-//private const val MODEL = "qwen2.5-coder:32b"
-private const val MODEL = "qwen2.5-coder:7b"
-//private const val MODEL = "qwen2.5-coder:14b"
 
 @Service
 class CodeGeneratorService(
@@ -173,6 +174,8 @@ class CodeGeneratorService(
 
         val entity = HttpEntity(request, headers)
 
+        val startTime = System.currentTimeMillis()
+
         val response = restTemplate.exchange(url, HttpMethod.POST, entity, String::class.java)
 
         val rr = response.body?.let {
@@ -188,6 +191,9 @@ class CodeGeneratorService(
 
         println("Gekregen SourceFiles object:\n$sourceFiles")
         saveGeneratedFiles(sourceFiles)
+        val endTime = System.currentTimeMillis()
+        println("Tijd: ${endTime - startTime} ms")
+
     }
 
     fun saveGeneratedFiles(sourceFiles: SourceFiles) {
