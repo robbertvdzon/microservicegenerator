@@ -6,23 +6,12 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.vdzon.aicode.model.Request
 import com.vdzon.aicode.model.SourceFiles
-import org.springframework.ai.ollama.api.OllamaApi
-import org.springframework.ai.ollama.api.OllamaOptions
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
-import org.springframework.http.MediaType
-import org.springframework.stereotype.Service
-import org.springframework.web.client.RestTemplate
+import java.io.BufferedReader
 import java.io.File
+import java.net.HttpURLConnection
+import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.net.URL
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.net.HttpURLConnection
 
 //private const val MODEL = "qwen2.5-coder:32b"
 private const val MODEL = "qwen2.5-coder:7b"
@@ -61,25 +50,16 @@ data class OllamaMessage(
 )
 
 
-//@Service
 class CodeGeneratorService(
     val githubService: GithubService
 ) {
 
 
     fun generateCode() {
-        val restTemplate = RestTemplate()
-
-        val ollamaOptions = OllamaOptions()
-        ollamaOptions.temperature = 0.2
-        ollamaOptions.format = "json" // Zorgt ervoor dat JSON wordt gegenereerd.
-
-
         val mainCode = githubService.getSerializedRepo("main")
         val branch = githubService.getSerializedRepo("story-002")
         val requestModel = Request(mainCode!!, branch!!)
         val requestJson = jacksonObjectMapper().writeValueAsString(requestModel)
-
 
         val systemPrompt = """
             You are a very experienced senior Kotlin developer, with a very good knowledge of Kotlin, spring and maven.
@@ -101,7 +81,6 @@ class CodeGeneratorService(
             Output **ONLY** valid JSON, nothing else.
             Output all files that are needed to create the project, including the pom.xml
         """.trimIndent()
-
 
         val content = """
                             I am working on a new feature for my project.
@@ -139,11 +118,7 @@ class CodeGeneratorService(
                                                         
                             
                             """
-        //---------
 
-//        val url = "http://localhost:11434/api/chat"
-
-        // JSON Schema dat de AI moet volgen
         val jsonSchema = mapOf(
             "type" to "object",
             "properties" to mapOf(
@@ -163,8 +138,6 @@ class CodeGeneratorService(
             "required" to listOf("files")
         )
 
-
-        // Request Body
         val request = OllamaRequest(
             model = MODEL,
             messages = listOf(
@@ -174,15 +147,8 @@ class CodeGeneratorService(
             format = jsonSchema
         )
 
-        val headers = HttpHeaders().apply {
-            contentType = MediaType.APPLICATION_JSON
-        }
-
-        val entity = HttpEntity(request, headers)
 
         val startTime = System.currentTimeMillis()
-
-
         val url = URL("http://localhost:11434/api/chat")
         val connection = url.openConnection() as HttpURLConnection
 
@@ -199,38 +165,23 @@ class CodeGeneratorService(
         val responseJson = connection.inputStream.bufferedReader().use(BufferedReader::readText)
 
 
-
-
         val rr = jacksonObjectMapper().readValue<OllamaResponse>(responseJson)
 
 
         val content2 = rr?.message?.content ?: ""
         val sourceFiles = jacksonObjectMapper().readValue<SourceFiles>(content2)
 
-        println(rr)
-
-
-
-        println("Gekregen SourceFiles object:\n$sourceFiles")
         saveGeneratedFiles(sourceFiles)
         val endTime = System.currentTimeMillis()
         println("Tijd: ${endTime - startTime} ms")
-
     }
 
     fun saveGeneratedFiles(sourceFiles: SourceFiles) {
         val basePath = "generated"
-
-        // Zorg ervoor dat de basisfolder bestaat
         Files.createDirectories(Paths.get(basePath))
-
         for (file in sourceFiles.files) {
             val filePath = "$basePath/${file.path}/${file.filename}"
-
-            // Maak de submap als deze nog niet bestaat
             Files.createDirectories(Paths.get("$basePath/${file.path}"))
-
-            // Schrijf de inhoud naar een bestand
             File(filePath).writeText(file.body)
             println("Bestand opgeslagen: $filePath")
         }

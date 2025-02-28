@@ -1,18 +1,13 @@
 package com.vdzon.aicode
 
 import com.vdzon.aicode.model.MicroserviceProject
-import org.springframework.stereotype.Service
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.vdzon.aicode.model.SourceFile
 import com.vdzon.aicode.model.Story
 import org.eclipse.jgit.api.Git
 import java.io.File
 
-data class GitHubTree(val tree: List<GitHubFile>)
 data class GitHubFile(val path: String, val type: String, val url: String?)
 
-//@Service
 class GithubService() {
 
     fun getSerializedRepo(branch: String): MicroserviceProject? {
@@ -22,9 +17,7 @@ class GithubService() {
                 branch = branch,
                 localPath = "/tmp/ai-repo"
             )
-        }
-        catch (e: Exception) {
-            println("Error: ${e.message}")
+        } catch (e: Exception) {
             e.printStackTrace()
             return null
         }
@@ -38,7 +31,7 @@ class GithubService() {
             println("Repo bestaat al lokaal: $localPath")
         } else {
             println("Cloning $repoUrl into $localPath...")
-            val git  = Git.cloneRepository()
+            val git = Git.cloneRepository()
                 .setURI(repoUrl)
                 .setBranch(branch)
                 .setDirectory(localDir)

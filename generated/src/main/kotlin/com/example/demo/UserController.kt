@@ -16,8 +16,8 @@ class UserController {
         return "User added"
     }
 
-    @DeleteMapping("/removeUser/{username}")
-    fun removeUser(@PathVariable username: String): String {
+    @PostMapping("/removeUser")
+    fun removeUser(@RequestParam username: String): String {
         userService.removeUsername(username)
         return "User removed"
     }
