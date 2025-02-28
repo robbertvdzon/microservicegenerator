@@ -17,9 +17,15 @@ import org.springframework.web.client.RestTemplate
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.net.URL
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
 
-private const val MODEL = "qwen2.5-coder:32b"
-//private const val MODEL = "qwen2.5-coder:7b"
+//private const val MODEL = "qwen2.5-coder:32b"
+private const val MODEL = "qwen2.5-coder:7b"
 //private const val MODEL = "qwen2.5-coder:14b"
 
 
@@ -135,7 +141,7 @@ class CodeGeneratorService(
                             """
         //---------
 
-        val url = "http://localhost:11434/api/chat"
+//        val url = "http://localhost:11434/api/chat"
 
         // JSON Schema dat de AI moet volgen
         val jsonSchema = mapOf(
@@ -176,11 +182,27 @@ class CodeGeneratorService(
 
         val startTime = System.currentTimeMillis()
 
-        val response = restTemplate.exchange(url, HttpMethod.POST, entity, String::class.java)
 
-        val rr = response.body?.let {
-            jacksonObjectMapper().readValue<OllamaResponse>(it)
-        }
+        val url = URL("http://localhost:11434/api/chat")
+        val connection = url.openConnection() as HttpURLConnection
+
+        connection.requestMethod = "POST"
+        connection.setRequestProperty("Content-Type", "application/json")
+        connection.doOutput = true
+
+
+        // Verstuur de JSON request
+        val requesJson = jacksonObjectMapper().writeValueAsString(request)
+        connection.outputStream.use { it.write(requesJson.toByteArray()) }
+
+        // Lees de response als String
+        val responseJson = connection.inputStream.bufferedReader().use(BufferedReader::readText)
+
+
+
+
+        val rr = jacksonObjectMapper().readValue<OllamaResponse>(responseJson)
+
 
         val content2 = rr?.message?.content ?: ""
         val sourceFiles = jacksonObjectMapper().readValue<SourceFiles>(content2)
