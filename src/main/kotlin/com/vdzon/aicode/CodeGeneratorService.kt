@@ -18,42 +18,9 @@ private const val MODEL = "qwen2.5-coder:7b"
 //private const val MODEL = "qwen2.5-coder:14b"
 
 
-// Kotlin Data Classes voor JSON Mapping
-data class OllamaRequest(
-    val model: String,
-    val messages: List<Message>,
-    val stream: Boolean = false,
-    val format: Map<String, Any>
-)
-
-data class Message(val role: String, val content: String)
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class OllamaResponse(
-    val model: String,
-    @JsonProperty("created_at") val createdAt: String,
-    val message: OllamaMessage,
-    @JsonProperty("done_reason") val doneReason: String,
-    val done: Boolean,
-    @JsonProperty("total_duration") val totalDuration: Long,
-    @JsonProperty("load_duration") val loadDuration: Long,
-    @JsonProperty("prompt_eval_count") val promptEvalCount: Int,
-    @JsonProperty("prompt_eval_duration") val promptEvalDuration: Long,
-    @JsonProperty("eval_count") val evalCount: Int,
-    @JsonProperty("eval_duration") val evalDuration: Long
-)
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class OllamaMessage(
-    val role: String,
-    val content: String
-)
-
-
 class CodeGeneratorService(
     val githubService: GithubService
 ) {
-
 
     fun generateCode() {
         val mainCode = githubService.getSerializedRepo("main")
@@ -114,9 +81,6 @@ class CodeGeneratorService(
                             Can you help me to generate the code for the new feature and improve the code in the feature branch?
                             Here is the json that contains the main branch and the feature branch:
                             $requestJson
-                                                        
-                                                        
-                            
                             """
 
         val jsonSchema = mapOf(
@@ -147,7 +111,6 @@ class CodeGeneratorService(
             format = jsonSchema
         )
 
-
         val startTime = System.currentTimeMillis()
         val url = URL("http://localhost:11434/api/chat")
         val connection = url.openConnection() as HttpURLConnection
@@ -163,7 +126,6 @@ class CodeGeneratorService(
 
         // Lees de response als String
         val responseJson = connection.inputStream.bufferedReader().use(BufferedReader::readText)
-
 
         val rr = jacksonObjectMapper().readValue<OllamaResponse>(responseJson)
 
