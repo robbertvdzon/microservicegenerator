@@ -1,9 +1,10 @@
 package com.vdzon.aicode
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.vdzon.aicode.model.Message
+import com.vdzon.aicode.model.OllamaRequest
+import com.vdzon.aicode.model.OllamaResponse
 import com.vdzon.aicode.model.Request
 import com.vdzon.aicode.model.SourceFiles
 import java.io.BufferedReader
@@ -127,11 +128,9 @@ class CodeGeneratorService(
         // Lees de response als String
         val responseJson = connection.inputStream.bufferedReader().use(BufferedReader::readText)
 
-        val rr = jacksonObjectMapper().readValue<OllamaResponse>(responseJson)
-
-
-        val content2 = rr?.message?.content ?: ""
-        val sourceFiles = jacksonObjectMapper().readValue<SourceFiles>(content2)
+        val ollamaResponse = jacksonObjectMapper().readValue<OllamaResponse>(responseJson)
+        val sourceFilesJson = ollamaResponse?.message?.content ?: ""
+        val sourceFiles = jacksonObjectMapper().readValue<SourceFiles>(sourceFilesJson)
 
         saveGeneratedFiles(sourceFiles)
         val endTime = System.currentTimeMillis()
