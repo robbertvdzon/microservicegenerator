@@ -1,22 +1,57 @@
 package com.vdzon.aicode
 
-import org.springframework.ai.ollama.api.OllamaApi
-import org.springframework.ai.ollama.api.OllamaApi.ChatRequest
-import org.springframework.ai.ollama.api.OllamaApi.ChatResponse
-import org.springframework.ai.ollama.api.OllamaApi.Message
-import org.springframework.ai.ollama.api.OllamaApi.Message.Role
-import org.springframework.ai.ollama.api.OllamaOptions
-import org.springframework.stereotype.Service
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.vdzon.aicode.model.Request
 import com.vdzon.aicode.model.SourceFiles
+import org.springframework.ai.ollama.api.OllamaApi
+import org.springframework.ai.ollama.api.OllamaOptions
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
+import org.springframework.http.MediaType
+import org.springframework.stereotype.Service
+import org.springframework.web.client.RestTemplate
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 
-private const val MODEL = "qwen2.5-coder:32b"
-//private const val MODEL = "qwen2.5-coder:7b"
+
+// Kotlin Data Classes voor JSON Mapping
+data class OllamaRequest(
+    val model: String,
+    val messages: List<Message>,
+    val stream: Boolean = false,
+    val format: Map<String, Any>
+)
+
+data class Message(val role: String, val content: String)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class OllamaResponse(
+    val model: String,
+    @JsonProperty("created_at") val createdAt: String,
+    val message: OllamaMessage,
+    @JsonProperty("done_reason") val doneReason: String,
+    val done: Boolean,
+    @JsonProperty("total_duration") val totalDuration: Long,
+    @JsonProperty("load_duration") val loadDuration: Long,
+    @JsonProperty("prompt_eval_count") val promptEvalCount: Int,
+    @JsonProperty("prompt_eval_duration") val promptEvalDuration: Long,
+    @JsonProperty("eval_count") val evalCount: Int,
+    @JsonProperty("eval_duration") val evalDuration: Long
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class OllamaMessage(
+    val role: String,
+    val content: String
+)
+
+//private const val MODEL = "qwen2.5-coder:32b"
+private const val MODEL = "qwen2.5-coder:7b"
 //private const val MODEL = "qwen2.5-coder:14b"
 
 @Service
@@ -24,13 +59,13 @@ class CodeGeneratorService(
     val githubService: GithubService
 ) {
 
+
     fun generateCode() {
-        val ollamaApi = OllamaApi()
+        val restTemplate = RestTemplate()
 
         val ollamaOptions = OllamaOptions()
         ollamaOptions.temperature = 0.2
         ollamaOptions.format = "json" // Zorgt ervoor dat JSON wordt gegenereerd.
-
 
 
         val mainCode = githubService.getSerializedRepo("main")
@@ -61,16 +96,7 @@ class CodeGeneratorService(
         """.trimIndent()
 
 
-
-        val request: ChatRequest = ChatRequest.builder(MODEL)
-            .stream(false)
-            .messages(
-                listOf(
-                    Message.builder(Role.SYSTEM)
-                        .content(systemPrompt)
-                        .build(),
-                    Message.builder(Role.USER)
-                        .content("""
+        val content = """
                             I am working on a new feature for my project.
                             I have a json that will show you the main version of the project. This will be the basis of where we will start developing.
                             The json also contains the feature branch that contains the new feature that needs to be added.
@@ -105,35 +131,63 @@ class CodeGeneratorService(
                                                         
                                                         
                             
-                            """)
-                        .build()
+                            """
+        //---------
+
+        val url = "http://localhost:11434/api/chat"
+
+        // JSON Schema dat de AI moet volgen
+        val jsonSchema = mapOf(
+            "type" to "object",
+            "properties" to mapOf(
+                "files" to mapOf(
+                    "type" to "array",
+                    "items" to mapOf(
+                        "type" to "object",
+                        "properties" to mapOf(
+                            "path" to mapOf("type" to "string"),
+                            "filename" to mapOf("type" to "string"),
+                            "body" to mapOf("type" to "string")
+                        ),
+                        "required" to listOf("path", "filename", "body")
+                    )
                 )
-            )
-            .options(ollamaOptions)
-            .build()
-        try {
-            val response: ChatResponse = ollamaApi.chat(request)
+            ),
+            "required" to listOf("files")
+        )
 
-            val jsonResponse = response.message()?.content() ?: "{}"
 
-            println("Ollama JSON output:\n$jsonResponse")
+        // Request Body
+        val request = OllamaRequest(
+            model = MODEL,
+            messages = listOf(
+                Message("system", systemPrompt),
+                Message("user", content)
+            ),
+            format = jsonSchema
+        )
 
-            // JSON parsen naar een SourceFiles-object
-            val objectMapper = jacksonObjectMapper()
-            val sourceFiles: SourceFiles? = try {
-                objectMapper.readValue(jsonResponse)
-            } catch (e: Exception) {
-                println("Fout bij het parsen van JSON: ${e.message}")
-                null
-            }
-
-            println("Gekregen SourceFiles object:\n$sourceFiles")
-            if (sourceFiles != null) {
-                saveGeneratedFiles(sourceFiles)
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
+        val headers = HttpHeaders().apply {
+            contentType = MediaType.APPLICATION_JSON
         }
+
+        val entity = HttpEntity(request, headers)
+
+        val response = restTemplate.exchange(url, HttpMethod.POST, entity, String::class.java)
+
+        val rr = response.body?.let {
+            jacksonObjectMapper().readValue<OllamaResponse>(it)
+        }
+
+        val content2 = rr?.message?.content ?: ""
+        val sourceFiles = jacksonObjectMapper().readValue<SourceFiles>(content2)
+
+        println(rr)
+
+
+
+        println("Gekregen SourceFiles object:\n$sourceFiles")
+        saveGeneratedFiles(sourceFiles)
     }
 
     fun saveGeneratedFiles(sourceFiles: SourceFiles) {

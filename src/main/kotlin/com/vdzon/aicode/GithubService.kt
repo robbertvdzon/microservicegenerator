@@ -38,7 +38,7 @@ class GithubService() {
             println("Repo bestaat al lokaal: $localPath")
         } else {
             println("Cloning $repoUrl into $localPath...")
-            Git.cloneRepository()
+            val git  = Git.cloneRepository()
                 .setURI(repoUrl)
                 .setBranch(branch)
                 .setDirectory(localDir)
