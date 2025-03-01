@@ -4,9 +4,10 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator
 import com.fasterxml.jackson.module.jsonSchema.types.ObjectSchema
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.vdzon.aicode.model.AiResponse
 
-interface AIEngine{
-    fun chat(systemPrompt: String, userPrompt: String): String
+interface AIEngine {
+    fun chat(systemPrompt: String, userPrompt: String): AiResponse
 
     // Functie om JSON Schema naar een Map te genereren
     fun generateJsonSchemaAsMap(clazz: Class<*>): Map<String, Any> {

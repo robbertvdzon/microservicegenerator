@@ -1,20 +1,17 @@
 package com.vdzon.aicode
 
-import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator
-import com.fasterxml.jackson.module.jsonSchema.types.ObjectSchema
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.vdzon.aicode.aiengine.OllamaEngine
 import com.vdzon.aicode.aiengine.OpenAiEngine
 import com.vdzon.aicode.model.Request
-import com.vdzon.aicode.model.SourceFiles
+import com.vdzon.aicode.model.SourceFile
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 
 //val aiEngine = OpenAiEngine("gpt-4.5-preview")
-//val aiEngine = OllamaEngine("qwen2.5-coder:32b")
-val aiEngine = OllamaEngine("qwen2.5-coder:14b")
+val aiEngine = OllamaEngine("qwen2.5-coder:32b")
+//val aiEngine = OllamaEngine("qwen2.5-coder:14b")
 //val aiEngine = OllamaEngine("qwen2.5-coder:7b")
 
 class CodeGeneratorService(
@@ -40,8 +37,13 @@ class CodeGeneratorService(
             Generate a JSON object that conforms to the following Kotlin data structure:
 
             ```kotlin
-            data class SourceFiles(val files: List<SourceFile>)
-            data class SourceFile(val path: String, val filename: String, val body: String)
+            data class AiResponse(
+                val modifiedSourceFiles: List<SourceFile>,
+                val newSourceFiles: List<SourceFile>,
+                val removedSourceFiles: List<SourceFileName>
+            )
+            data class SourceFileName(val path: String, val filename: String)
+            data class SourceFile(val sourceFilename: SourceFileName, val body: String)
             ```
             
             Output **ONLY** valid JSON, nothing else.
@@ -83,19 +85,18 @@ class CodeGeneratorService(
                             """
 
         val startTime = System.currentTimeMillis()
-        val sourceFilesJson = aiEngine.chat(systemPrompt, userPrompt)
-        val sourceFiles = jacksonObjectMapper().readValue<SourceFiles>(sourceFilesJson)
+        val aiResponse = aiEngine.chat(systemPrompt, userPrompt)
 //        saveGeneratedFiles(sourceFiles)
         val endTime = System.currentTimeMillis()
-        println("Tijd: ${endTime - startTime} ms, ${sourceFiles.files.size} files")
+        println("Tijd: ${endTime - startTime} ms, ${aiResponse.newSourceFiles.size} new files, ${aiResponse.modifiedSourceFiles.size} modified files, ${aiResponse.removedSourceFiles.size} removed files")
     }
 
-    fun saveGeneratedFiles(sourceFiles: SourceFiles) {
+    fun saveGeneratedFiles(sourceFiles: List<SourceFile>) {
         val basePath = "generated"
         Files.createDirectories(Paths.get(basePath))
-        for (file in sourceFiles.files) {
-            val filePath = "$basePath/${file.path}/${file.filename}"
-            Files.createDirectories(Paths.get("$basePath/${file.path}"))
+        for (file in sourceFiles) {
+            val filePath = "$basePath/${file.sourceFilename.path}/${file.sourceFilename.filename}"
+            Files.createDirectories(Paths.get("$basePath/${file.sourceFilename.path}"))
             File(filePath).writeText(file.body)
             println("Bestand opgeslagen: $filePath")
         }

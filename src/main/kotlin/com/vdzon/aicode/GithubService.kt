@@ -2,6 +2,7 @@ package com.vdzon.aicode
 
 import com.vdzon.aicode.model.MicroserviceProject
 import com.vdzon.aicode.model.SourceFile
+import com.vdzon.aicode.model.SourceFileName
 import com.vdzon.aicode.model.Story
 import org.eclipse.jgit.api.Git
 import java.io.File
@@ -50,8 +51,7 @@ class GithubService() {
             val filename = path.name
             val body = it.readText()
             SourceFile(
-                path1,
-                filename,
+                SourceFileName(path1, filename),
                 body
             )
         }.toList()

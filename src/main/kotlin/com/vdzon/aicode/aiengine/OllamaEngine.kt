@@ -2,18 +2,23 @@ package com.vdzon.aicode.aiengine
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.vdzon.aicode.model.Message
 import com.vdzon.aicode.model.AIRequest
-import com.vdzon.aicode.model.SourceFiles
+import com.vdzon.aicode.model.AiResponse
+import com.vdzon.aicode.model.Message
 import com.vdzon.aicode.model.ollama.OllamaResponse
-import com.vdzon.aicode.model.openai.OpenAIResponse
 import java.io.BufferedReader
 import java.net.HttpURLConnection
 import java.net.URL
 
-class OllamaEngine(val model: String): AIEngine {
-    override fun chat(systemPrompt: String, userPrompt: String): String {
-        val jsonSchema = generateJsonSchemaAsMap(SourceFiles::class.java)
+
+//data class SourceFile2(val path: String, val filename: String, val body: String)
+//data class SourceFiles2(val files: List<SourceFile2>)
+
+
+class OllamaEngine(val model: String) : AIEngine {
+    override fun chat(systemPrompt: String, userPrompt: String): AiResponse {
+//        val jsonSchema = generateJsonSchemaAsMap(SourceFile2::class.java)
+        val jsonSchema = generateJsonSchemaAsMap(AiResponse::class.java)
         val request = AIRequest(
             model = model,
             messages = listOf(
@@ -31,8 +36,11 @@ class OllamaEngine(val model: String): AIEngine {
         connection.outputStream.use { it.write(requesJson.toByteArray()) }
         val responseJson = connection.inputStream.bufferedReader().use(BufferedReader::readText)
         val ollamaResponse = jacksonObjectMapper().readValue(responseJson, object : TypeReference<OllamaResponse>() {})
-        val sourceFilesJson = ollamaResponse?.message?.content ?: ""
-        return sourceFilesJson
+
+        val aiResponse = jacksonObjectMapper().readValue(
+            ollamaResponse?.message?.content ?: "",
+            object : TypeReference<AiResponse>() {})
+        return aiResponse
 
 
     }

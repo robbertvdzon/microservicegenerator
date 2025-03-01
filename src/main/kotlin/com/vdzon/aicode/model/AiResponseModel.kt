@@ -1,9 +1,9 @@
 package com.vdzon.aicode.model
 
 data class AiResponse(
-    val sourceFiles: SourceFiles
+    val modifiedSourceFiles: List<SourceFile>,
+    val newSourceFiles: List<SourceFile>,
+    val removedSourceFiles: List<SourceFileName>
 )
-
-data class SourceFile(val path: String, val filename: String, val body: String)
-
-data class SourceFiles(val files: List<SourceFile>)
+data class SourceFileName(val path: String, val filename: String)
+data class SourceFile(val sourceFilename: SourceFileName, val body: String)

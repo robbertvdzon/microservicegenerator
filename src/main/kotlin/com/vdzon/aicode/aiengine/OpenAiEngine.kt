@@ -2,17 +2,17 @@ package com.vdzon.aicode.aiengine
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.vdzon.aicode.model.Message
 import com.vdzon.aicode.model.AIRequest
-import com.vdzon.aicode.model.SourceFiles
+import com.vdzon.aicode.model.AiResponse
+import com.vdzon.aicode.model.Message
 import com.vdzon.aicode.model.openai.OpenAIResponse
 import java.io.BufferedReader
 import java.net.HttpURLConnection
 import java.net.URL
 
-class OpenAiEngine(val model: String): AIEngine {
-    override fun chat(systemPrompt: String, userPrompt: String): String {
-        val jsonSchema = generateJsonSchemaAsMap(SourceFiles::class.java)
+class OpenAiEngine(val model: String) : AIEngine {
+    override fun chat(systemPrompt: String, userPrompt: String): AiResponse {
+        val jsonSchema = generateJsonSchemaAsMap(AiResponse::class.java)
         val request = AIRequest(
             model = model,
             messages = listOf(
@@ -35,8 +35,11 @@ class OpenAiEngine(val model: String): AIEngine {
         val openAiResponse = jacksonObjectMapper().readValue(responseJson, object : TypeReference<OpenAIResponse>() {})
 
 
-        val sourceFilesJson = openAiResponse?.choices?.firstOrNull()?.message?.content ?: ""
-        return sourceFilesJson
+        val aiResponse = jacksonObjectMapper().readValue(
+            openAiResponse?.choices?.firstOrNull()?.message?.content ?: "",
+            object : TypeReference<AiResponse>() {})
+        return aiResponse
+
 
     }
 
