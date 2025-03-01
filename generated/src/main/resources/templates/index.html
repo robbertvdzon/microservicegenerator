@@ -23,10 +23,6 @@
     <ul>
         <li th:each="username : ${usernames}" th:text="${username}"></li>
     </ul>
-    <form action="/removeUser/{username}" method="post" th:each="username : ${usernames}"
-          th:attr="action=${'/' + 'removeUser/' + username}">
-        <button type="submit">Remove User</button>
-    </form>
 </div>
 </body>
 </html>

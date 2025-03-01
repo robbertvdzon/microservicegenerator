@@ -15,12 +15,6 @@ class UserController {
         userService.addUsername(username)
         return "User added"
     }
-
-    @PostMapping("/removeUser")
-    fun removeUser(@RequestParam username: String): String {
-        userService.removeUsername(username)
-        return "User removed"
-    }
 }
 
 @Controller
