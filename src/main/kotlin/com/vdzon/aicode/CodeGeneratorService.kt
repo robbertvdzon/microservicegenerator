@@ -4,7 +4,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.vdzon.aicode.model.Message
 import com.vdzon.aicode.model.OllamaRequest
-import com.vdzon.aicode.model.OllamaResponse
+import com.vdzon.aicode.model.OpenAIResponse
 import com.vdzon.aicode.model.Request
 import com.vdzon.aicode.model.SourceFiles
 import java.io.BufferedReader
@@ -15,8 +15,20 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 //private const val MODEL = "qwen2.5-coder:32b"
-private const val MODEL = "qwen2.5-coder:7b"
+//private val ENGINE = AI_ENGINE.OLLAMA
+
+private const val MODEL = "gpt-4.5-preview"
+private val ENGINE = AI_ENGINE.OPENAI
+
+
+//private const val MODEL = "qwen2.5-coder:7b"
 //private const val MODEL = "qwen2.5-coder:14b"
+
+
+enum class AI_ENGINE {
+    OLLAMA,
+    OPENAI,
+}
 
 
 class CodeGeneratorService(
@@ -113,25 +125,37 @@ class CodeGeneratorService(
         )
 
         val startTime = System.currentTimeMillis()
+
+/*
         val url = URL("http://localhost:11434/api/chat")
         val connection = url.openConnection() as HttpURLConnection
-
         connection.requestMethod = "POST"
         connection.setRequestProperty("Content-Type", "application/json")
         connection.doOutput = true
-
-
-        // Verstuur de JSON request
         val requesJson = jacksonObjectMapper().writeValueAsString(request)
         connection.outputStream.use { it.write(requesJson.toByteArray()) }
-
-        // Lees de response als String
         val responseJson = connection.inputStream.bufferedReader().use(BufferedReader::readText)
-
         val ollamaResponse = jacksonObjectMapper().readValue<OllamaResponse>(responseJson)
         val sourceFilesJson = ollamaResponse?.message?.content ?: ""
-        val sourceFiles = jacksonObjectMapper().readValue<SourceFiles>(sourceFilesJson)
+*/
+        val apiKey = System.getenv("OPENAI_API_KEY")
+        val url = URL("https://api.openai.com/v1/chat/completions")
+        val connection = url.openConnection() as HttpURLConnection
+        connection.requestMethod = "POST"
+        connection.setRequestProperty("Content-Type", "application/json")
+        connection.setRequestProperty("Authorization", "Bearer $apiKey")
 
+        connection.doOutput = true
+        val requesJson = jacksonObjectMapper().writeValueAsString(request)
+        connection.outputStream.use { it.write(requesJson.toByteArray()) }
+        val responseJson = connection.inputStream.bufferedReader().use(BufferedReader::readText)
+        val openAiResponse = jacksonObjectMapper().readValue<OpenAIResponse>(responseJson)
+        val sourceFilesJson = openAiResponse?.choices?.firstOrNull()?.message?.content ?: ""
+
+
+// ---
+
+        val sourceFiles = jacksonObjectMapper().readValue<SourceFiles>(sourceFilesJson)
         saveGeneratedFiles(sourceFiles)
         val endTime = System.currentTimeMillis()
         println("Tijd: ${endTime - startTime} ms")

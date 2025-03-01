@@ -37,6 +37,22 @@ data class OllamaRequest(
 data class Message(val role: String, val content: String)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+data class OpenAIResponse(
+    val choices: List<OpenAiChoice>,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class OpenAiChoice(
+    val message: OpenAiMessage,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class OpenAiMessage(
+    val role: String,
+    val content: String
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class OllamaResponse(
     val model: String,
     @JsonProperty("created_at") val createdAt: String,
