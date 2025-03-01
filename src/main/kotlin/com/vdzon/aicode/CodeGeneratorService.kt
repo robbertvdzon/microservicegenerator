@@ -13,8 +13,8 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 //val aiEngine = OpenAiEngine("gpt-4.5-preview")
-val aiEngine = OllamaEngine("qwen2.5-coder:32b")
-//val aiEngine = OllamaEngine("qwen2.5-coder:14b")
+//val aiEngine = OllamaEngine("qwen2.5-coder:32b")
+val aiEngine = OllamaEngine("qwen2.5-coder:14b")
 //val aiEngine = OllamaEngine("qwen2.5-coder:7b")
 
 class CodeGeneratorService(

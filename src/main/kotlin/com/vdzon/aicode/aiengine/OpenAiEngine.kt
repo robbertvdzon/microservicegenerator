@@ -1,11 +1,11 @@
 package com.vdzon.aicode.aiengine
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.vdzon.aicode.model.Message
-import com.vdzon.aicode.model.OllamaRequest
-import com.vdzon.aicode.model.OpenAIResponse
+import com.vdzon.aicode.model.AIRequest
 import com.vdzon.aicode.model.SourceFiles
+import com.vdzon.aicode.model.openai.OpenAIResponse
 import java.io.BufferedReader
 import java.net.HttpURLConnection
 import java.net.URL
@@ -13,7 +13,7 @@ import java.net.URL
 class OpenAiEngine(val model: String): AIEngine {
     override fun chat(systemPrompt: String, userPrompt: String): String {
         val jsonSchema = generateJsonSchemaAsMap(SourceFiles::class.java)
-        val request = OllamaRequest(
+        val request = AIRequest(
             model = model,
             messages = listOf(
                 Message("system", systemPrompt),
@@ -32,7 +32,9 @@ class OpenAiEngine(val model: String): AIEngine {
         val requesJson = jacksonObjectMapper().writeValueAsString(request)
         connection.outputStream.use { it.write(requesJson.toByteArray()) }
         val responseJson = connection.inputStream.bufferedReader().use(BufferedReader::readText)
-        val openAiResponse = jacksonObjectMapper().readValue<OpenAIResponse>(responseJson)
+        val openAiResponse = jacksonObjectMapper().readValue(responseJson, object : TypeReference<OpenAIResponse>() {})
+
+
         val sourceFilesJson = openAiResponse?.choices?.firstOrNull()?.message?.content ?: ""
         return sourceFilesJson
 
