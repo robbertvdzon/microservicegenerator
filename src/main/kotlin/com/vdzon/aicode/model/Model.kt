@@ -31,7 +31,7 @@ data class OllamaRequest(
     val model: String,
     val messages: List<Message>,
     val stream: Boolean = false,
-    val format: Map<String, Any>
+    val format: String
 )
 
 data class Message(val role: String, val content: String)
