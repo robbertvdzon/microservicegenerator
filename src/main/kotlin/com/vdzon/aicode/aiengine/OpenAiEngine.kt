@@ -12,8 +12,7 @@ import java.net.URL
 
 class OpenAiEngine(val model: String): AIEngine {
     override fun chat(systemPrompt: String, userPrompt: String): String {
-        val jsonSchema = generateJsonSchema(SourceFiles::class.java)
-
+        val jsonSchema = generateJsonSchemaAsMap(SourceFiles::class.java)
         val request = OllamaRequest(
             model = model,
             messages = listOf(
@@ -22,7 +21,6 @@ class OpenAiEngine(val model: String): AIEngine {
             ),
             format = jsonSchema
         )
-
         val apiKey = System.getenv("OPENAI_API_KEY")
         val url = URL("https://api.openai.com/v1/chat/completions")
         val connection = url.openConnection() as HttpURLConnection

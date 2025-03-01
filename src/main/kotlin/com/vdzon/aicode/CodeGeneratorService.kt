@@ -1,53 +1,25 @@
 package com.vdzon.aicode
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
-import com.vdzon.aicode.model.Message
-import com.vdzon.aicode.model.OllamaRequest
-import com.vdzon.aicode.model.OpenAIResponse
-import com.vdzon.aicode.model.Request
-import com.vdzon.aicode.model.SourceFiles
-import java.io.BufferedReader
-import java.io.File
-import java.net.HttpURLConnection
-import java.net.URL
-import java.nio.file.Files
-import java.nio.file.Paths
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator
 import com.fasterxml.jackson.module.jsonSchema.types.ObjectSchema
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.vdzon.aicode.aiengine.OllamaEngine
 import com.vdzon.aicode.aiengine.OpenAiEngine
-import com.vdzon.aicode.model.OllamaResponse
+import com.vdzon.aicode.model.Request
+import com.vdzon.aicode.model.SourceFiles
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.Paths
 
-val aiEngine = OpenAiEngine("gpt-4.5-preview")
-//val aiEngine = OllamaEngine("qwen2.5-coder:32b")
+//val aiEngine = OpenAiEngine("gpt-4.5-preview")
+val aiEngine = OllamaEngine("qwen2.5-coder:32b")
 //val aiEngine = OllamaEngine("qwen2.5-coder:14b")
 //val aiEngine = OllamaEngine("qwen2.5-coder:7b")
-
-//private const val MODEL = "qwen2.5-coder:32b"
-//private val ENGINE = AI_ENGINE.OLLAMA
-
-//private const val MODEL = "gpt-4.5-preview"
-//private val ENGINE = AI_ENGINE.OPENAI
-
-
-//private const val MODEL = "qwen2.5-coder:7b"
-//private const val MODEL = "qwen2.5-coder:14b"
-
-
 
 class CodeGeneratorService(
     val githubService: GithubService
 ) {
-
-
-    fun generateJsonSchema(clazz: Class<*>): String {
-        val objectMapper = jacksonObjectMapper()
-        val schemaGen = JsonSchemaGenerator(objectMapper)
-        val schema: ObjectSchema = schemaGen.generateSchema(clazz) as ObjectSchema
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(schema)
-    }
-
 
     fun generateCode() {
         val mainCode = githubService.getSerializedRepo("main")
@@ -110,55 +82,12 @@ class CodeGeneratorService(
                             $requestJson
                             """
 
-
-//        val jsonSchema = generateJsonSchema(SourceFiles::class.java)
-
-//        val request = OllamaRequest(
-//            model = MODEL,
-//            messages = listOf(
-//                Message("system", systemPrompt),
-//                Message("user", userPrompt)
-//            ),
-//            format = jsonSchema
-//        )
-
         val startTime = System.currentTimeMillis()
-
-//
-//        val url = URL("http://localhost:11434/api/chat")
-//        val connection = url.openConnection() as HttpURLConnection
-//        connection.requestMethod = "POST"
-//        connection.setRequestProperty("Content-Type", "application/json")
-//        connection.doOutput = true
-//        val requesJson = jacksonObjectMapper().writeValueAsString(request)
-//        connection.outputStream.use { it.write(requesJson.toByteArray()) }
-//        val responseJson = connection.inputStream.bufferedReader().use(BufferedReader::readText)
-//        val ollamaResponse = jacksonObjectMapper().readValue<OllamaResponse>(responseJson)
-//        val sourceFilesJson = ollamaResponse?.message?.content ?: ""
-//
-
-/*
-        val apiKey = System.getenv("OPENAI_API_KEY")
-        val url = URL("https://api.openai.com/v1/chat/completions")
-        val connection = url.openConnection() as HttpURLConnection
-        connection.requestMethod = "POST"
-        connection.setRequestProperty("Content-Type", "application/json")
-        connection.setRequestProperty("Authorization", "Bearer $apiKey")
-
-        connection.doOutput = true
-        val requesJson = jacksonObjectMapper().writeValueAsString(request)
-        connection.outputStream.use { it.write(requesJson.toByteArray()) }
-        val responseJson = connection.inputStream.bufferedReader().use(BufferedReader::readText)
-        val openAiResponse = jacksonObjectMapper().readValue<OpenAIResponse>(responseJson)
-        val sourceFilesJson = openAiResponse?.choices?.firstOrNull()?.message?.content ?: ""
-*/
-
-// ---
-    val sourceFilesJson = aiEngine.chat(systemPrompt, userPrompt)
+        val sourceFilesJson = aiEngine.chat(systemPrompt, userPrompt)
         val sourceFiles = jacksonObjectMapper().readValue<SourceFiles>(sourceFilesJson)
 //        saveGeneratedFiles(sourceFiles)
         val endTime = System.currentTimeMillis()
-        println("Tijd: ${endTime - startTime} ms")
+        println("Tijd: ${endTime - startTime} ms, ${sourceFiles.files.size} files")
     }
 
     fun saveGeneratedFiles(sourceFiles: SourceFiles) {
