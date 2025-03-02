@@ -9,8 +9,8 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 
-//val aiEngine = OpenAiEngine("gpt-4.5-preview")
-val aiEngine = OllamaEngine("qwen2.5-coder:32b")
+val aiEngine = OpenAiEngine("gpt-4.5-preview")
+//val aiEngine = OllamaEngine("qwen2.5-coder:32b")
 //val aiEngine = OllamaEngine("qwen2.5-coder:14b")
 //val aiEngine = OllamaEngine("qwen2.5-coder:7b")
 
@@ -86,14 +86,25 @@ class CodeGeneratorService(
 
         val startTime = System.currentTimeMillis()
         val aiResponse = aiEngine.chat(systemPrompt, userPrompt)
-//        saveGeneratedFiles(sourceFiles)
+        val git = githubService.cloneRepo(
+            "git@github.com:robbertvdzon/sample-generated-ai-project.git",
+            "story-002",
+            "/tmp/ai-repo"
+        )
+        saveGeneratedFiles(aiResponse.newSourceFiles)
+        saveGeneratedFiles(aiResponse.modifiedSourceFiles)
+        githubService.addToGit(git, aiResponse.newSourceFiles.map { it.sourceFilename },"generated")
+        githubService.addToGit(git, aiResponse.modifiedSourceFiles.map { it.sourceFilename },"generated")
+        githubService.removeFromGit(git, aiResponse.removedSourceFiles,"generated")
+        githubService.commit(git, "updated by AI")
+        githubService.push("/tmp/ai-repo")
         val endTime = System.currentTimeMillis()
         println("Tijd: ${endTime - startTime} ms, ${aiResponse.newSourceFiles.size} new files, ${aiResponse.modifiedSourceFiles.size} modified files, ${aiResponse.removedSourceFiles.size} removed files")
     }
 
     fun saveGeneratedFiles(sourceFiles: List<SourceFile>) {
-        val basePath = "generated"
-        Files.createDirectories(Paths.get(basePath))
+        val basePath = "/tmp/ai-repo/generated"
+        //        Files.createDirectories(Paths.get("/tmp/ai-repo"))
         for (file in sourceFiles) {
             val filePath = "$basePath/${file.sourceFilename.path}/${file.sourceFilename.filename}"
             Files.createDirectories(Paths.get("$basePath/${file.sourceFilename.path}"))
@@ -101,4 +112,5 @@ class CodeGeneratorService(
             println("Bestand opgeslagen: $filePath")
         }
     }
+
 }
