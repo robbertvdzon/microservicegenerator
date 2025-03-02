@@ -11,78 +11,58 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 const val SCHEMA_JSON = """
-    {
+{
   "type": "object",
-  "id": "urn:jsonschema:com:vdzon:aicode:model:AiResponse",
   "properties": {
     "modifiedSourceFiles": {
       "type": "array",
-      "required": true,
       "items": {
         "type": "object",
-        "id": "urn:jsonschema:com:vdzon:aicode:model:SourceFile",
         "properties": {
           "sourceFilename": {
             "type": "object",
-            "id": "urn:jsonschema:com:vdzon:aicode:model:SourceFileName",
-            "required": true,
             "properties": {
-              "path": {
-                "type": "string",
-                "required": true
-              },
-              "filename": {
-                "type": "string",
-                "required": true
-              }
-            }
+              "path": { "type": "string" },
+              "filename": { "type": "string" }
+            },
+            "required": ["path", "filename"]
           },
-          "body": {
-            "type": "string",
-            "required": true
-          }
-        }
+          "body": { "type": "string" }
+        },
+        "required": ["sourceFilename", "body"]
       }
     },
     "newSourceFiles": {
       "type": "array",
-      "required": true,
       "items": {
         "type": "object",
-        "id": "urn:jsonschema:com:vdzon:aicode:model:SourceFileName",
-        "required": true,
         "properties": {
-          "path": {
-            "type": "string",
-            "required": true
+          "sourceFilename": {
+            "type": "object",
+            "properties": {
+              "path": { "type": "string" },
+              "filename": { "type": "string" }
+            },
+            "required": ["path", "filename"]
           },
-          "filename": {
-            "type": "string",
-            "required": true
-          }
-        }
+          "body": { "type": "string" }
+        },
+        "required": ["sourceFilename", "body"]
       }
     },
     "removedSourceFiles": {
       "type": "array",
-      "required": true,
       "items": {
         "type": "object",
-        "id": "urn:jsonschema:com:vdzon:aicode:model:SourceFileName",
-        "required": true,
         "properties": {
-          "path": {
-            "type": "string",
-            "required": true
-          },
-          "filename": {
-            "type": "string",
-            "required": true
-          }
-        }
+          "path": { "type": "string" },
+          "filename": { "type": "string" }
+        },
+        "required": ["path", "filename"]
       }
     }
-  }
+  },
+  "required": ["modifiedSourceFiles", "newSourceFiles", "removedSourceFiles"]
 }
 """
 class OllamaEngine(val model: String) : AIEngine {
