@@ -10,15 +10,90 @@ import java.io.BufferedReader
 import java.net.HttpURLConnection
 import java.net.URL
 
-
-//data class SourceFile2(val path: String, val filename: String, val body: String)
-//data class SourceFiles2(val files: List<SourceFile2>)
-
-
+const val SCHEMA_JSON = """
+    {
+  "type": "object",
+  "id": "urn:jsonschema:com:vdzon:aicode:model:AiResponse",
+  "properties": {
+    "modifiedSourceFiles": {
+      "type": "array",
+      "required": true,
+      "items": {
+        "type": "object",
+        "id": "urn:jsonschema:com:vdzon:aicode:model:SourceFile",
+        "properties": {
+          "sourceFilename": {
+            "type": "object",
+            "id": "urn:jsonschema:com:vdzon:aicode:model:SourceFileName",
+            "required": true,
+            "properties": {
+              "path": {
+                "type": "string",
+                "required": true
+              },
+              "filename": {
+                "type": "string",
+                "required": true
+              }
+            }
+          },
+          "body": {
+            "type": "string",
+            "required": true
+          }
+        }
+      }
+    },
+    "newSourceFiles": {
+      "type": "array",
+      "required": true,
+      "items": {
+        "type": "object",
+        "id": "urn:jsonschema:com:vdzon:aicode:model:SourceFileName",
+        "required": true,
+        "properties": {
+          "path": {
+            "type": "string",
+            "required": true
+          },
+          "filename": {
+            "type": "string",
+            "required": true
+          }
+        }
+      }
+    },
+    "removedSourceFiles": {
+      "type": "array",
+      "required": true,
+      "items": {
+        "type": "object",
+        "id": "urn:jsonschema:com:vdzon:aicode:model:SourceFileName",
+        "required": true,
+        "properties": {
+          "path": {
+            "type": "string",
+            "required": true
+          },
+          "filename": {
+            "type": "string",
+            "required": true
+          }
+        }
+      }
+    }
+  }
+}
+"""
 class OllamaEngine(val model: String) : AIEngine {
     override fun chat(systemPrompt: String, userPrompt: String): AiResponse {
-//        val jsonSchema = generateJsonSchemaAsMap(SourceFile2::class.java)
-        val jsonSchema = generateJsonSchemaAsMap(AiResponse::class.java)
+//        val jsonSchema = generateJsonSchemaAsMap(AiResponse::class.java)
+        /*
+        Note: the jsonSchema from generateJsonSchemaAsMap uses #ref for classes that are already used.
+              openAI workt correctly with that, but Ollama does not. So we use a hardcoded jsonSchema for now
+         */
+        val jsonSchema = jacksonObjectMapper().readValue(SCHEMA_JSON, object : TypeReference<Map<String, Any>>() {})
+
         val request = AIRequest(
             model = model,
             messages = listOf(
