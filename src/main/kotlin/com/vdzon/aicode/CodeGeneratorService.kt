@@ -9,7 +9,9 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 
-val aiEngine = OpenAiEngine("gpt-4.5-preview")
+//val aiEngine = OpenAiEngine("gpt-4.5-preview") // beste en snelst, alleen kan instabiel zijn
+//val aiEngine = OpenAiEngine("gpt-4o") // beste en snelst en stabiel
+val aiEngine = OpenAiEngine("gpt-3.5-turbo") // niet zo goed, wel snel
 //val aiEngine = OllamaEngine("qwen2.5-coder:32b")
 //val aiEngine = OllamaEngine("qwen2.5-coder:14b")
 //val aiEngine = OllamaEngine("qwen2.5-coder:7b")
@@ -33,7 +35,8 @@ class CodeGeneratorService(
             You will be asked to generate the code for the new feature in the feature branch if that is still missing, or fix any code in the branch that is wrong.
             
             You will output the code as a valid JSON output. 
-            DO NOT include markdown formatting, explanations, or additional text.        
+            DO NOT include markdown formatting, explanations, or additional text.       
+            DO NOT include the JSON markdown codeblocks like (```json) and (```) in the output.
             Generate a JSON object that conforms to the following Kotlin data structure:
 
             ```kotlin
@@ -97,7 +100,7 @@ class CodeGeneratorService(
         githubService.addToGit(git, aiResponse.modifiedSourceFiles.map { it.sourceFilename },"generated")
         githubService.removeFromGit(git, aiResponse.removedSourceFiles,"generated")
         githubService.commit(git, "updated by AI")
-        githubService.push("/tmp/ai-repo")
+//        githubService.push("/tmp/ai-repo")
         val endTime = System.currentTimeMillis()
         println("Tijd: ${endTime - startTime} ms, ${aiResponse.newSourceFiles.size} new files, ${aiResponse.modifiedSourceFiles.size} modified files, ${aiResponse.removedSourceFiles.size} removed files")
     }
