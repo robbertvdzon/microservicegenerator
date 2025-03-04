@@ -3,15 +3,16 @@ package com.vdzon.aicode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.vdzon.aicode.aiengine.OllamaEngine
 import com.vdzon.aicode.aiengine.OpenAiEngine
+import com.vdzon.aicode.model.AiResponse
 import com.vdzon.aicode.model.Request
 import com.vdzon.aicode.model.SourceFile
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 
-//val aiEngine = OpenAiEngine("gpt-4.5-preview") // beste en snelst, alleen kan instabiel zijn
+val aiEngine = OpenAiEngine("gpt-4.5-preview") // beste en snelst, alleen kan instabiel zijn
 //val aiEngine = OpenAiEngine("gpt-4o") // beste en snelst en stabiel
-val aiEngine = OpenAiEngine("gpt-3.5-turbo") // niet zo goed, wel snel
+//val aiEngine = OpenAiEngine("gpt-3.5-turbo") // niet zo goed, wel snel
 //val aiEngine = OllamaEngine("qwen2.5-coder:32b")
 //val aiEngine = OllamaEngine("qwen2.5-coder:14b")
 //val aiEngine = OllamaEngine("qwen2.5-coder:7b")
@@ -43,7 +44,8 @@ class CodeGeneratorService(
             data class AiResponse(
                 val modifiedSourceFiles: List<SourceFile>,
                 val newSourceFiles: List<SourceFile>,
-                val removedSourceFiles: List<SourceFileName>
+                val removedSourceFiles: List<SourceFileName>,
+                val explanationOfCodeChanges: String,
             )
             data class SourceFileName(val path: String, val filename: String)
             data class SourceFile(val sourceFilename: SourceFileName, val body: String)
@@ -88,7 +90,7 @@ class CodeGeneratorService(
                             """
 
         val startTime = System.currentTimeMillis()
-        val aiResponse = aiEngine.chat(systemPrompt, userPrompt)
+        val aiResponse: AiResponse = aiEngine.chat(systemPrompt, userPrompt)
         val git = githubService.cloneRepo(
             "git@github.com:robbertvdzon/sample-generated-ai-project.git",
             "story-002",
@@ -100,9 +102,10 @@ class CodeGeneratorService(
         githubService.addToGit(git, aiResponse.modifiedSourceFiles.map { it.sourceFilename },"generated")
         githubService.removeFromGit(git, aiResponse.removedSourceFiles,"generated")
         githubService.commit(git, "updated by AI")
-        githubService.push("/tmp/ai-repo")
+//        githubService.push("/tmp/ai-repo")
         val endTime = System.currentTimeMillis()
         println("Tijd: ${endTime - startTime} ms, ${aiResponse.newSourceFiles.size} new files, ${aiResponse.modifiedSourceFiles.size} modified files, ${aiResponse.removedSourceFiles.size} removed files")
+        print(aiResponse.explanationOfCodeChanges)
     }
 
     fun saveGeneratedFiles(sourceFiles: List<SourceFile>) {

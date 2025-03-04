@@ -10,70 +10,9 @@ import java.io.BufferedReader
 import java.net.HttpURLConnection
 import java.net.URL
 
-const val SCHEMA_JSON = """
-{
-  "type": "object",
-  "properties": {
-    "modifiedSourceFiles": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "sourceFilename": {
-            "type": "object",
-            "properties": {
-              "path": { "type": "string" },
-              "filename": { "type": "string" }
-            },
-            "required": ["path", "filename"]
-          },
-          "body": { "type": "string" }
-        },
-        "required": ["sourceFilename", "body"]
-      }
-    },
-    "newSourceFiles": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "sourceFilename": {
-            "type": "object",
-            "properties": {
-              "path": { "type": "string" },
-              "filename": { "type": "string" }
-            },
-            "required": ["path", "filename"]
-          },
-          "body": { "type": "string" }
-        },
-        "required": ["sourceFilename", "body"]
-      }
-    },
-    "removedSourceFiles": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "path": { "type": "string" },
-          "filename": { "type": "string" }
-        },
-        "required": ["path", "filename"]
-      }
-    }
-  },
-  "required": ["modifiedSourceFiles", "newSourceFiles", "removedSourceFiles"]
-}
-"""
 class OllamaEngine(val model: String) : AIEngine {
     override fun chat(systemPrompt: String, userPrompt: String): AiResponse {
-//        val jsonSchema = generateJsonSchemaAsMap(AiResponse::class.java)
-        /*
-        Note: the jsonSchema from generateJsonSchemaAsMap uses #ref for classes that are already used.
-              openAI workt correctly with that, but Ollama does not. So we use a hardcoded jsonSchema for now
-         */
-        val jsonSchema = jacksonObjectMapper().readValue(SCHEMA_JSON, object : TypeReference<Map<String, Any>>() {})
-
+        val jsonSchema = generateJsonSchemaAsMap(AiResponse::class.java)
         val request = AIRequest(
             model = model,
             messages = listOf(
