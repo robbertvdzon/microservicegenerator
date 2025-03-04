@@ -100,7 +100,7 @@ class CodeGeneratorService(
         githubService.addToGit(git, aiResponse.modifiedSourceFiles.map { it.sourceFilename },"generated")
         githubService.removeFromGit(git, aiResponse.removedSourceFiles,"generated")
         githubService.commit(git, "updated by AI")
-//        githubService.push("/tmp/ai-repo")
+        githubService.push("/tmp/ai-repo")
         val endTime = System.currentTimeMillis()
         println("Tijd: ${endTime - startTime} ms, ${aiResponse.newSourceFiles.size} new files, ${aiResponse.modifiedSourceFiles.size} modified files, ${aiResponse.removedSourceFiles.size} removed files")
     }
