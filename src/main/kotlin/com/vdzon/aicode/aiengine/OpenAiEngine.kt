@@ -34,9 +34,9 @@ class OpenAiEngine(val model: String) : AIEngine {
         val responseJson = connection.inputStream.bufferedReader().use(BufferedReader::readText)
         val openAiResponse = jacksonObjectMapper().readValue(responseJson, object : TypeReference<OpenAIResponse>() {})
 
-        println("\n\n\n")
-        println("openAiResponse: \n$responseJson")
-        println("\n\n\n")
+//        println("\n\n\n")
+//        println("openAiResponse: \n$responseJson")
+//        println("\n\n\n")
         val aiResponse = jacksonObjectMapper().readValue(
             openAiResponse?.choices?.firstOrNull()?.message?.content ?: "",
             object : TypeReference<AiResponse>() {})

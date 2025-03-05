@@ -46,8 +46,6 @@ class GithubService() {
 
     fun cloneAndListFiles(repoUrl: String, branch: String, localPath: String): MicroserviceProject {
         cloneRepo(repoUrl, branch, localPath)
-        println("📂 Bestanden in branch '$branch':")
-
         val srcDir = File("$localPath/generated")
         val storiesDir = File("$localPath/stories")
 
@@ -81,8 +79,6 @@ class GithubService() {
             technicalSpecifications = technicalSpecs.readLines(),
             stories = stories
         )
-
-
     }
 
     val sshSessionFactory = SshdSessionFactory()
@@ -91,38 +87,13 @@ class GithubService() {
         val localDir = File(localPath)
         localDir.deleteRecursively()
         println("Cloning $repoUrl into $localPath...")
-
         val process = ProcessBuilder("git", "clone", "--branch", branch, repoUrl, localPath)
-            .redirectErrorStream(true) // Combineer stdout en stderr
+            .redirectErrorStream(true)
             .start()
-
         val output = process.inputStream.bufferedReader().use { it.readText() }
         val exitCode = process.waitFor()
-
-        println(output)
-
         return Git.open(localDir)
     }
-//
-//    fun cloneRepo(repoUrl: String, branch: String, localPath: String): Git {
-//        val localDir = File(localPath)
-//        localDir.deleteRecursively()
-//        println("Cloning $repoUrl into $localPath...")
-//        val cloneCommand = Git.cloneRepository()
-//            .setURI(repoUrl)
-//            .setBranch(branch)
-//            .setDirectory(localDir)
-////        cloneCommand.setTransportConfigCallback(SshTransportConfigCallback(sshSessionFactory))
-//
-////
-////        cloneCommand.setTransportConfigCallback { transport ->
-////            if (transport is SshTransport) {
-////                transport.sshSessionFactory = sessionFactory
-////            }
-////        }
-//        val git = cloneCommand.call()
-//        return git
-//    }
 
     fun addToGit(git: Git, names: List<SourceFileName>, prefix: String) {
         names.forEach {
@@ -145,15 +116,11 @@ class GithubService() {
 
     fun push(localDir: String): Boolean {
         val process = ProcessBuilder("git", "push", "origin", "HEAD")
-            .directory(File(localDir))  // Voer het commando uit in de lokale repo-map
-            .redirectErrorStream(true)  // Combineer stdout en stderr
+            .directory(File(localDir))
+            .redirectErrorStream(true)
             .start()
-
         val output = process.inputStream.bufferedReader().use { it.readText() }
         val exitCode = process.waitFor()
-
-        println(output)
-
         return exitCode == 0
     }
 
