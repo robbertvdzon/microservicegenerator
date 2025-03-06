@@ -15,18 +15,18 @@ data class Message(val role: String, val content: String)
 data class Request(
     val mainBranch: MicroserviceProject?,
     val featureBranch: MicroserviceProject?,
+    val storyToImplement: Story
 )
 
 data class MicroserviceProject(
     val branch: String,
     val sourceFiles: List<SourceFile>,
     val functionalSpecifications: List<String>,
-    val technicalSpecifications: List<String>,
-    val stories: List<Story>,
+    val technicalSpecifications: List<String>
 )
 
 data class Story(
-    val storyname: String,
-    val storyDescription: String
+    val title: String,
+    val body: String
 )
 

@@ -5,6 +5,7 @@ data class AiResponse(
     val newSourceFiles: List<SourceFile>,
     val removedSourceFiles: List<SourceFileName>,
     val explanationOfCodeChanges: String,
+    val commitMessage: String,
 )
 data class SourceFileName(val path: String, val filename: String)
 data class SourceFile(val sourceFilename: SourceFileName, val body: String)

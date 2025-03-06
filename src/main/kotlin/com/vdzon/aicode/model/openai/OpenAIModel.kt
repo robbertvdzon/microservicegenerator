@@ -6,6 +6,15 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class OpenAIResponse(
     val choices: List<OpenAiChoice>,
+    val usage: Usage,
+    val model: String
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Usage(
+    val prompt_tokens: Int,
+    val completion_tokens: Int,
+    val total_tokens: Int
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)

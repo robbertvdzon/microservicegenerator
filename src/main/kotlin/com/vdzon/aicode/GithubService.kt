@@ -1,5 +1,7 @@
 package com.vdzon.aicode
 
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.jcraft.jsch.JSch
 import com.jcraft.jsch.Session
 import com.vdzon.aicode.model.MicroserviceProject
@@ -7,11 +9,10 @@ import com.vdzon.aicode.model.SourceFile
 import com.vdzon.aicode.model.SourceFileName
 import com.vdzon.aicode.model.Story
 import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.transport.SshTransport
 import org.eclipse.jgit.transport.ssh.jsch.JschConfigSessionFactory
 import org.eclipse.jgit.transport.ssh.jsch.OpenSshConfig
-import org.eclipse.jgit.transport.sshd.SshdSessionFactory
 import org.eclipse.jgit.util.FS
+import java.io.BufferedReader
 import java.io.File
 
 data class GitHubFile(val path: String, val type: String, val url: String?)
@@ -43,11 +44,29 @@ class GithubService() {
         }
     }
 
+    fun getTicket(repoUrl: String, ticket: String): Story {
+        val repoName = repoUrl.removePrefix("https://github.com/").removeSuffix(".git")
+        val command = listOf("gh", "issue", "view", ticket, "--repo", repoName, "--json", "title,body")
+
+        val process = ProcessBuilder(command)
+            .redirectErrorStream(true)
+            .start()
+
+        val output = process.inputStream.bufferedReader().use(BufferedReader::readText)
+        process.waitFor()
+
+        if (process.exitValue() != 0) {
+            throw RuntimeException("Error fetching ticket: $output")
+        }
+        val story = jacksonObjectMapper().readValue(output, object : TypeReference<Story>() {})
+        return story
+
+    }
+
 
     fun cloneAndListFiles(repoUrl: String, branch: String, localPath: String): MicroserviceProject {
         cloneRepo(repoUrl, branch, localPath)
         val srcDir = File("$localPath/generated")
-        val storiesDir = File("$localPath/stories")
 
         val sourceFiles = srcDir.walk().filter { it.isFile }.map {
             val path = it.relativeTo(srcDir)
@@ -61,14 +80,6 @@ class GithubService() {
             )
         }.toList()
 
-        val stories = storiesDir.walk().filter { it.isFile }.map {
-            val path = it.relativeTo(srcDir)
-            Story(
-                path.path,
-                it.readText()
-            )
-        }.toList()
-
         val functionalSpecs = File("$localPath/specs/functional_specs.txt")
         val technicalSpecs = File("$localPath/specs/technical_specs.txt")
 
@@ -76,12 +87,9 @@ class GithubService() {
             branch = branch,
             sourceFiles = sourceFiles,
             functionalSpecifications = functionalSpecs.readLines(),
-            technicalSpecifications = technicalSpecs.readLines(),
-            stories = stories
+            technicalSpecifications = technicalSpecs.readLines()
         )
     }
-
-    val sshSessionFactory = SshdSessionFactory()
 
     fun cloneRepo(repoUrl: String, branch: String, localPath: String): Git {
         val localDir = File(localPath)
@@ -90,8 +98,8 @@ class GithubService() {
         val process = ProcessBuilder("git", "clone", "--branch", branch, repoUrl, localPath)
             .redirectErrorStream(true)
             .start()
-        val output = process.inputStream.bufferedReader().use { it.readText() }
-        val exitCode = process.waitFor()
+        process.inputStream.bufferedReader().use { it.readText() }
+        process.waitFor()
         return Git.open(localDir)
     }
 

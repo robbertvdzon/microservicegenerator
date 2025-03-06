@@ -30,12 +30,13 @@ class CodeGeneratorService(
 
     fun generateCode() {
         println("\nStart generating code..")
+        val storyToImplement = githubService.getTicket(repo, story)
         val mainCode = githubService.getSerializedRepo(mainbranch)
         val branch = githubService.getSerializedRepo(featurebranch)
         println("calling AI model..")
 
         val startTime = System.currentTimeMillis()
-        val requestModel = Request(mainCode!!, branch!!)
+        val requestModel = Request(mainCode!!, branch!!, storyToImplement)
         val requestJson = jacksonObjectMapper().writeValueAsString(requestModel)
         val aiResponse: AiResponse = aiEngine.chat(tokenGenerator.getSystemToken(), tokenGenerator.getUserToken(requestJson))
         val endTime = System.currentTimeMillis()
@@ -53,8 +54,8 @@ class CodeGeneratorService(
         githubService.addToGit(git, aiResponse.newSourceFiles.map { it.sourceFilename },"generated")
         githubService.addToGit(git, aiResponse.modifiedSourceFiles.map { it.sourceFilename },"generated")
         githubService.removeFromGit(git, aiResponse.removedSourceFiles,"generated")
-        githubService.commit(git, "updated by AI")
-//        githubService.push("/tmp/ai-repo")
+        githubService.commit(git, aiResponse.commitMessage)
+        githubService.push("/tmp/ai-repo")
         println("\nExplanation from AI:")
         print(aiResponse.explanationOfCodeChanges)
     }
