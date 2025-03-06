@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.vdzon.aicode.GithubService
 import com.vdzon.aicode.aiengine.AiEngineFactory
+import com.vdzon.aicode.aiengine.util.JsonSchemaHelper
+import com.vdzon.aicode.bots.AIBot
 import com.vdzon.aicode.commonmodel.SourceFile
 import com.vdzon.aicode.bots.codegenerator.CodeGeneratorTokens
 import java.io.File
@@ -11,18 +13,22 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 class CodeGeneratorService(
-    val githubService: GithubService,
-    val repo: String,
-    val mainbranch: String,
-    val featurebranch: String,
-    val story: String,
-    val engine: String,
-    val model: String
-) {
-    private val tokenGenerator = CodeGeneratorTokens()
-    private val aiEngine= AiEngineFactory.getAiEngine(engine, model)
+): AIBot {
+    override fun getName(): String = "implement_story"
+    override fun getDescription(): String = "Implement a story"
+    override fun getHelp(): String = "implement_story githubrepo mainbranch featurebranch story engine model"
+    override fun run(args: Array<String>){
+        val repo = args.getOrNull(1) ?: throw RuntimeException("Invalid repo")
+        val mainbranch = args.getOrNull(2) ?: throw RuntimeException("Invalid main branch")
+        val featurebranch = args.getOrNull(3) ?: throw RuntimeException("feature branch")
+        val story = args.getOrNull(4) ?: throw RuntimeException("Invalid story")
+        val engine = args.getOrNull(5) ?: throw RuntimeException("Invalid engine")
+        val model = args.getOrNull(6) ?: throw RuntimeException("Invalid model")
 
-    fun generateCode() {
+        val tokenGenerator = CodeGeneratorTokens()
+        val aiEngine= AiEngineFactory.getAiEngine(engine, model)
+        val githubService =  GithubService()
+
         println("\nStart generating code..")
         val storyToImplement = githubService.getTicket(repo, story)
         val mainCode = githubService.getSerializedRepo(mainbranch)
@@ -32,7 +38,7 @@ class CodeGeneratorService(
         val startTime = System.currentTimeMillis()
         val requestModel = Request(mainCode!!, branch!!, storyToImplement)
         val requestJson = jacksonObjectMapper().writeValueAsString(requestModel)
-        val jsonSchema: Map<String, Any> = aiEngine.generateJsonSchemaAsMap(AiResponse::class.java)
+        val jsonSchema: Map<String, Any> = JsonSchemaHelper.generateJsonSchemaAsMap(AiResponse::class.java)
         val jsonResponse = aiEngine.chat(jsonSchema, tokenGenerator.getSystemToken(), tokenGenerator.getUserToken(requestJson))
         val aiResponse: AiResponse = jacksonObjectMapper().readValue(jsonResponse,object : TypeReference<AiResponse>() {})
         val endTime = System.currentTimeMillis()
@@ -54,7 +60,9 @@ class CodeGeneratorService(
         githubService.push("/tmp/ai-repo")
         println("\nExplanation from AI:")
         print(aiResponse.explanationOfCodeChanges)
+
     }
+
 
     fun saveGeneratedFiles(sourceFiles: List<SourceFile>) {
         val basePath = "/tmp/ai-repo/generated"
