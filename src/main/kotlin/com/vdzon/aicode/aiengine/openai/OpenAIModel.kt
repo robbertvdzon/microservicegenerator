@@ -1,7 +1,6 @@
-package com.vdzon.aicode.model.openai
+package com.vdzon.aicode.aiengine.openai
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class OpenAIResponse(

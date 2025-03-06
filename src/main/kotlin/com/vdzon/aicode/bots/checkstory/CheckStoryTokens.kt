@@ -1,5 +1,4 @@
-package com.vdzon.aicode.token
-
+package com.vdzon.aicode.bots.checkstory
 
 class CheckStoryTokens {
 

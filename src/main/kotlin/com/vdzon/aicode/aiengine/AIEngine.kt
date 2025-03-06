@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator
 import com.fasterxml.jackson.module.jsonSchema.types.ObjectSchema
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.vdzon.aicode.model.response.AiResponse
 
 interface AIEngine {
     fun chat(jsonSchema: Map<String, Any>, systemPrompt: String, userPrompt: String): String

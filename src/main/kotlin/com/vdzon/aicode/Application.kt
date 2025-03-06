@@ -1,7 +1,7 @@
 package com.vdzon.aicode
 
-import com.vdzon.aicode.bots.CheckStoryService
-import com.vdzon.aicode.bots.CodeGeneratorService
+import com.vdzon.aicode.bots.checkstory.CheckStoryService
+import com.vdzon.aicode.bots.codegenerator.CodeGeneratorService
 
 
 class Application

@@ -1,11 +1,10 @@
-package com.vdzon.aicode.aiengine
+package com.vdzon.aicode.aiengine.ollama
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.vdzon.aicode.model.request.AIRequest
-import com.vdzon.aicode.model.response.AiResponse
-import com.vdzon.aicode.model.request.Message
-import com.vdzon.aicode.model.ollama.OllamaResponse
+import com.vdzon.aicode.aiengine.AIEngine
+import com.vdzon.aicode.commonmodel.AIRequest
+import com.vdzon.aicode.commonmodel.Message
 import java.io.BufferedReader
 import java.net.HttpURLConnection
 import java.net.URL
@@ -33,8 +32,5 @@ class OllamaEngine(val model: String) : AIEngine {
 
         val json = ollamaResponse?.message?.content ?: ""
         return json
-
-
     }
-
 }

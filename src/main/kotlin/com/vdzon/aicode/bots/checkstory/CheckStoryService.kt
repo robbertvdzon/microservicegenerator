@@ -1,16 +1,10 @@
-package com.vdzon.aicode.bots
+package com.vdzon.aicode.bots.checkstory
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.vdzon.aicode.GithubService
 import com.vdzon.aicode.aiengine.AiEngineFactory
-import com.vdzon.aicode.model.request.CheckStoryRequest
-import com.vdzon.aicode.model.response.AiResponse
-import com.vdzon.aicode.model.request.Request
-import com.vdzon.aicode.model.response.CheckStoryAiResponse
-import com.vdzon.aicode.token.CheckStoryTokens
-import com.vdzon.aicode.token.CodeGeneratorTokens
-
+import com.vdzon.aicode.bots.checkstory.CheckStoryTokens
 
 class CheckStoryService(
     val githubService: GithubService,

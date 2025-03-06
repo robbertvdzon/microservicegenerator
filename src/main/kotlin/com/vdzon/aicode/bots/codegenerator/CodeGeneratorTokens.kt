@@ -1,5 +1,4 @@
-package com.vdzon.aicode.token
-
+package com.vdzon.aicode.bots.codegenerator
 
 class CodeGeneratorTokens {
 

@@ -1,4 +1,7 @@
-package com.vdzon.aicode.model.response
+package com.vdzon.aicode.bots.codegenerator
+
+import com.vdzon.aicode.commonmodel.SourceFile
+import com.vdzon.aicode.commonmodel.SourceFileName
 
 data class AiResponse(
     val modifiedSourceFiles: List<SourceFile>,

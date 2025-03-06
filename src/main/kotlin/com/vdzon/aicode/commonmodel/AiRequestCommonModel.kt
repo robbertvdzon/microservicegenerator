@@ -1,6 +1,4 @@
-package com.vdzon.aicode.model.request
-
-import com.vdzon.aicode.model.response.SourceFile
+package com.vdzon.aicode.commonmodel
 
 // AI data model
 data class AIRequest(

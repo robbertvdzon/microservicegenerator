@@ -1,8 +1,7 @@
-package com.vdzon.aicode.model.ollama
+package com.vdzon.aicode.aiengine.ollama
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
-
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class OllamaResponse(

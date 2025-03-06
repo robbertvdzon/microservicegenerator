@@ -1,4 +1,4 @@
-package com.vdzon.aicode.model.response
+package com.vdzon.aicode.bots.checkstory
 
 data class CheckStoryAiResponse(
     val commentsAboutStory: String,

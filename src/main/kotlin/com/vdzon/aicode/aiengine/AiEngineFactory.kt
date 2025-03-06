@@ -1,5 +1,8 @@
 package com.vdzon.aicode.aiengine
 
+import com.vdzon.aicode.aiengine.ollama.OllamaEngine
+import com.vdzon.aicode.aiengine.openai.OpenAiEngine
+
 object AiEngineFactory {
     fun getAiEngine(engine: String, model: String): AIEngine {
         return when (engine) {

@@ -1,4 +1,7 @@
-package com.vdzon.aicode.model.request
+package com.vdzon.aicode.bots.codegenerator
+
+import com.vdzon.aicode.commonmodel.MicroserviceProject
+import com.vdzon.aicode.commonmodel.Story
 
 
 data class Request(
