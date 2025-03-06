@@ -24,7 +24,7 @@ class CodeReviewBot(
         val aiEngine= AiEngineFactory.getAiEngine(engine, model)
         val githubService =  GithubService()
 
-        println("\nStart generating code..")
+        println("\nStart code review..")
         val storyToImplement = githubService.getTicket(repo, story)
         val mainCode = githubService.getSerializedRepo(mainbranch)
         val branch = githubService.getSerializedRepo(featurebranch)
