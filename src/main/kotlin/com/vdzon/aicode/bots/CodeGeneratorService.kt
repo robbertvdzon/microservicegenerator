@@ -1,10 +1,12 @@
-package com.vdzon.aicode
+package com.vdzon.aicode.bots
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.vdzon.aicode.GithubService
 import com.vdzon.aicode.aiengine.OpenAiEngine
-import com.vdzon.aicode.model.AiResponse
-import com.vdzon.aicode.model.Request
-import com.vdzon.aicode.model.SourceFile
+import com.vdzon.aicode.model.response.AiResponse
+import com.vdzon.aicode.model.request.Request
+import com.vdzon.aicode.model.response.SourceFile
 import com.vdzon.aicode.token.CodeGeneratorTokens
 import java.io.File
 import java.nio.file.Files
@@ -38,7 +40,9 @@ class CodeGeneratorService(
         val startTime = System.currentTimeMillis()
         val requestModel = Request(mainCode!!, branch!!, storyToImplement)
         val requestJson = jacksonObjectMapper().writeValueAsString(requestModel)
-        val aiResponse: AiResponse = aiEngine.chat(tokenGenerator.getSystemToken(), tokenGenerator.getUserToken(requestJson))
+        val jsonSchema: Map<String, Any> = aiEngine.generateJsonSchemaAsMap(AiResponse::class.java)
+        val jsonResponse = aiEngine.chat(jsonSchema, tokenGenerator.getSystemToken(), tokenGenerator.getUserToken(requestJson))
+        val aiResponse: AiResponse = jacksonObjectMapper().readValue(jsonResponse,object : TypeReference<AiResponse>() {})
         val endTime = System.currentTimeMillis()
 
         println("Ai finished in: ${endTime - startTime} ms, ${aiResponse.newSourceFiles.size} new files, ${aiResponse.modifiedSourceFiles.size} modified files, ${aiResponse.removedSourceFiles.size} removed files")

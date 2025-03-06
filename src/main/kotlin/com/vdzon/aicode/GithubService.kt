@@ -4,10 +4,10 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.jcraft.jsch.JSch
 import com.jcraft.jsch.Session
-import com.vdzon.aicode.model.MicroserviceProject
-import com.vdzon.aicode.model.SourceFile
-import com.vdzon.aicode.model.SourceFileName
-import com.vdzon.aicode.model.Story
+import com.vdzon.aicode.model.request.MicroserviceProject
+import com.vdzon.aicode.model.response.SourceFile
+import com.vdzon.aicode.model.response.SourceFileName
+import com.vdzon.aicode.model.request.Story
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.transport.ssh.jsch.JschConfigSessionFactory
 import org.eclipse.jgit.transport.ssh.jsch.OpenSshConfig

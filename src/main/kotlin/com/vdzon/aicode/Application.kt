@@ -1,13 +1,16 @@
 package com.vdzon.aicode
 
+import com.vdzon.aicode.bots.CheckStoryService
+import com.vdzon.aicode.bots.CodeGeneratorService
+
 
 class Application
 
 fun main(args: Array<String>) {
     val action = args.getOrNull(0)
-    when(action) {
+    when (action) {
         null -> noAction()
-        "check_story" -> notImplemented()
+        "check_story" -> checkStory(args)
         "implement_story" -> generateCode(args)
         "code_review" -> notImplemented()
         "explain_branch" -> notImplemented()
@@ -22,12 +25,12 @@ private fun invalidAction() {
 }
 
 private fun generateCode(args: Array<String>) {
-    val repo = args.getOrNull(1)?:throw RuntimeException("Invalid repo")
-    val mainbranch = args.getOrNull(2)?:throw RuntimeException("Invalid main branch")
-    val featurebranch = args.getOrNull(3)?:throw RuntimeException("feature branch")
-    val story = args.getOrNull(4)?:throw RuntimeException("Invalid story")
-    val engine = args.getOrNull(5)?:throw RuntimeException("Invalid engine")
-    val model = args.getOrNull(6)?:throw RuntimeException("Invalid model")
+    val repo = args.getOrNull(1) ?: throw RuntimeException("Invalid repo")
+    val mainbranch = args.getOrNull(2) ?: throw RuntimeException("Invalid main branch")
+    val featurebranch = args.getOrNull(3) ?: throw RuntimeException("feature branch")
+    val story = args.getOrNull(4) ?: throw RuntimeException("Invalid story")
+    val engine = args.getOrNull(5) ?: throw RuntimeException("Invalid engine")
+    val model = args.getOrNull(6) ?: throw RuntimeException("Invalid model")
     println("Generating code:")
     println("repo: $repo")
     println("mainbranch: $mainbranch")
@@ -38,9 +41,30 @@ private fun generateCode(args: Array<String>) {
 
 
     val githubService: GithubService = GithubService()
-    val codeGeneratorService = CodeGeneratorService(githubService, repo, mainbranch, featurebranch, story, engine, model)
+    val codeGeneratorService =
+        CodeGeneratorService(githubService, repo, mainbranch, featurebranch, story, engine, model)
     codeGeneratorService.generateCode()
 }
+
+private fun checkStory(args: Array<String>) {
+    val repo = args.getOrNull(1) ?: throw RuntimeException("Invalid repo")
+    val mainbranch = args.getOrNull(2) ?: throw RuntimeException("Invalid main branch")
+    val story = args.getOrNull(3) ?: throw RuntimeException("Invalid story")
+    val engine = args.getOrNull(4) ?: throw RuntimeException("Invalid engine")
+    val model = args.getOrNull(5) ?: throw RuntimeException("Invalid model")
+    println("Generating code:")
+    println("repo: $repo")
+    println("mainbranch: $mainbranch")
+    println("story: $story")
+    println("engine: $engine")
+    println("model: $model")
+
+
+    val githubService = GithubService()
+    val bot = CheckStoryService(githubService, repo, mainbranch, story, engine, model)
+    bot.generateCode()
+}
+
 
 private fun noAction() {
     println("No action")

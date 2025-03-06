@@ -1,4 +1,6 @@
-package com.vdzon.aicode.model
+package com.vdzon.aicode.model.request
+
+import com.vdzon.aicode.model.response.SourceFile
 
 // AI data model
 data class AIRequest(
@@ -11,12 +13,6 @@ data class AIRequest(
 data class Message(val role: String, val content: String)
 
 // own data model that we provide to the AI model in the AIRequest
-
-data class Request(
-    val mainBranch: MicroserviceProject?,
-    val featureBranch: MicroserviceProject?,
-    val storyToImplement: Story
-)
 
 data class MicroserviceProject(
     val branch: String,
