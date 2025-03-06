@@ -3,6 +3,8 @@ package com.vdzon.aicode.bots
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.vdzon.aicode.GithubService
+import com.vdzon.aicode.aiengine.AiEngineFactory
+import com.vdzon.aicode.aiengine.OllamaEngine
 import com.vdzon.aicode.aiengine.OpenAiEngine
 import com.vdzon.aicode.model.response.AiResponse
 import com.vdzon.aicode.model.request.Request
@@ -12,8 +14,9 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 
-val aiEngine = OpenAiEngine("gpt-4.5-preview") // beste en snelst, alleen kan instabiel zijn
+//val aiEngine = OpenAiEngine("gpt-4.5-preview") // beste en snelst, alleen kan instabiel zijn
 //val aiEngine = OpenAiEngine("gpt-4o") // beste en snelst en stabiel
+//val aiEngine = OpenAiEngine("o3-mini") // werkt niet
 //val aiEngine = OpenAiEngine("gpt-3.5-turbo") // niet zo goed, wel snel
 //val aiEngine = OllamaEngine("qwen2.5-coder:32b")
 //val aiEngine = OllamaEngine("qwen2.5-coder:14b")
@@ -29,6 +32,7 @@ class CodeGeneratorService(
     val model: String
 ) {
     private val tokenGenerator = CodeGeneratorTokens()
+    private val aiEngine= AiEngineFactory.getAiEngine(engine, model)
 
     fun generateCode() {
         println("\nStart generating code..")

@@ -32,7 +32,7 @@ class OpenAiEngine(val model: String) : AIEngine {
         connection.outputStream.use { it.write(requesJson.toByteArray()) }
         val responseJson = connection.inputStream.bufferedReader().use(BufferedReader::readText)
         val openAiResponse = jacksonObjectMapper().readValue(responseJson, object : TypeReference<OpenAIResponse>() {})
-        println("prompt tokens: ${openAiResponse.usage.prompt_tokens} completion tokens: ${openAiResponse.usage.completion_tokens} total tokens: ${openAiResponse.usage.total_tokens}")
+        println("OpenAI: prompt tokens: ${openAiResponse.usage.prompt_tokens} completion tokens: ${openAiResponse.usage.completion_tokens} total tokens: ${openAiResponse.usage.total_tokens} model: ${openAiResponse.model}")
 
         val json = openAiResponse?.choices?.firstOrNull()?.message?.content ?: ""
         return json

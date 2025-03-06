@@ -3,6 +3,7 @@ package com.vdzon.aicode.bots
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.vdzon.aicode.GithubService
+import com.vdzon.aicode.aiengine.AiEngineFactory
 import com.vdzon.aicode.model.request.CheckStoryRequest
 import com.vdzon.aicode.model.response.AiResponse
 import com.vdzon.aicode.model.request.Request
@@ -20,10 +21,13 @@ class CheckStoryService(
     val model: String
 ) {
     private val tokenGenerator = CheckStoryTokens()
+    private val aiEngine= AiEngineFactory.getAiEngine(engine, model)
 
     fun generateCode() {
         println("\nStart generating code..")
         val storyToImplement = githubService.getTicket(repo, story)
+        println("Story to implement: ${storyToImplement.title}")
+        println("${storyToImplement.body}")
         val mainCode = githubService.getSerializedRepo(mainbranch)
         println("calling AI model..")
 

@@ -29,6 +29,7 @@ class OllamaEngine(val model: String) : AIEngine {
         connection.outputStream.use { it.write(requesJson.toByteArray()) }
         val responseJson = connection.inputStream.bufferedReader().use(BufferedReader::readText)
         val ollamaResponse = jacksonObjectMapper().readValue(responseJson, object : TypeReference<OllamaResponse>() {})
+        println("Ollama: promptEvalCount:${ollamaResponse.promptEvalCount} evalCount:${ollamaResponse.evalCount}  model: ${ollamaResponse.model}")
 
         val json = ollamaResponse?.message?.content ?: ""
         return json
