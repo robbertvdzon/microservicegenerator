@@ -7,12 +7,11 @@ import com.vdzon.aicode.aiengine.AiEngineFactory
 import com.vdzon.aicode.aiengine.util.JsonSchemaHelper
 import com.vdzon.aicode.bots.AIBot
 import com.vdzon.aicode.commonmodel.SourceFile
-import com.vdzon.aicode.bots.codegenerator.CodeGeneratorTokens
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 
-class CodeGeneratorService(
+class CodeGeneratorBot(
 ): AIBot {
     override fun getName(): String = "implement_story"
     override fun getDescription(): String = "Implement a story"
@@ -25,7 +24,7 @@ class CodeGeneratorService(
         val engine = args.getOrNull(5) ?: throw RuntimeException("Invalid engine")
         val model = args.getOrNull(6) ?: throw RuntimeException("Invalid model")
 
-        val tokenGenerator = CodeGeneratorTokens()
+        val tokenGenerator = Tokens()
         val aiEngine= AiEngineFactory.getAiEngine(engine, model)
         val githubService =  GithubService()
 

@@ -1,6 +1,6 @@
 package com.vdzon.aicode.bots.checkstory
 
-class CheckStoryTokens {
+class Tokens {
 
     fun getSystemToken() = """
             You are a very experienced senior Kotlin developer, with a very good knowledge of Kotlin, spring and maven.

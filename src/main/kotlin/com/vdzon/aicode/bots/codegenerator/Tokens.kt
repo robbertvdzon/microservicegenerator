@@ -1,6 +1,6 @@
 package com.vdzon.aicode.bots.codegenerator
 
-class CodeGeneratorTokens {
+internal class Tokens {
 
     fun getSystemToken() = """
             You are a very experienced senior Kotlin developer, with a very good knowledge of Kotlin, spring and maven.

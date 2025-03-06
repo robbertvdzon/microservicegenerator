@@ -6,9 +6,8 @@ import com.vdzon.aicode.GithubService
 import com.vdzon.aicode.aiengine.AiEngineFactory
 import com.vdzon.aicode.aiengine.util.JsonSchemaHelper
 import com.vdzon.aicode.bots.AIBot
-import com.vdzon.aicode.bots.checkstory.CheckStoryTokens
 
-class CheckStoryService(): AIBot {
+class CheckStoryBot(): AIBot {
 
     override fun getName(): String = "check_story"
     override fun getDescription(): String = "Check the story"
@@ -20,7 +19,7 @@ class CheckStoryService(): AIBot {
         val engine = args.getOrNull(4) ?: throw RuntimeException("Invalid engine")
         val model = args.getOrNull(5) ?: throw RuntimeException("Invalid model")
 
-        val tokenGenerator = CheckStoryTokens()
+        val tokenGenerator = Tokens()
         val aiEngine= AiEngineFactory.getAiEngine(engine, model)
         val githubService =  GithubService()
 

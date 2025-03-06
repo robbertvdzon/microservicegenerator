@@ -4,7 +4,7 @@ import com.vdzon.aicode.commonmodel.MicroserviceProject
 import com.vdzon.aicode.commonmodel.Story
 
 
-data class Request(
+internal data class Request(
     val mainBranch: MicroserviceProject?,
     val featureBranch: MicroserviceProject?,
     val storyToImplement: Story
