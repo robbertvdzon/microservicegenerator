@@ -22,7 +22,7 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            width: 400px;
+            width: 800px; /* Dubbele breedte */
         }
 
         h1 {
@@ -40,11 +40,12 @@
         }
 
         td {
-            padding: 8px;
+            padding: 10px;
             vertical-align: middle;
+            font-size: 16px;
         }
 
-        input {
+        input, select {
             width: 100%;
             padding: 8px;
             border: 1px solid #ccc;
@@ -54,18 +55,18 @@
 
         .button-container {
             text-align: center;
-            margin-top: 15px;
+            margin-top: 20px;
         }
 
         button {
             background-color: #007bff;
             color: white;
             border: none;
-            padding: 10px 15px;
-            margin: 5px;
+            padding: 12px 20px;
+            margin: 10px;
             cursor: pointer;
             border-radius: 5px;
-            font-size: 16px;
+            font-size: 18px;
             width: 45%;
         }
 
@@ -76,7 +77,7 @@
     <script>
         // Sla invoer op in cookies
         function saveToCookies() {
-            document.querySelectorAll("input").forEach(input => {
+            document.querySelectorAll("input, select").forEach(input => {
                 document.cookie = input.id + "=" + encodeURIComponent(input.value) + "; path=/";
             });
         }
@@ -142,11 +143,25 @@
         </tr>
         <tr>
             <td><label for="engine">Engine:</label></td>
-            <td><input type="text" id="engine"></td>
+            <td>
+                <select id="engine">
+                    <option value="OPEN_AI">OPEN_AI</option>
+                    <option value="OLLAMA">OLLAMA</option>
+                </select>
+            </td>
         </tr>
         <tr>
             <td><label for="model">Model:</label></td>
-            <td><input type="text" id="model"></td>
+            <td>
+                <select id="model">
+                    <option value="gpt-4.5-preview">gpt-4.5-preview</option>
+                    <option value="gpt-4o">gpt-4o</option>
+                    <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+                    <option value="qwen2.5-coder:32b">qwen2.5-coder:32b</option>
+                    <option value="qwen2.5-coder:14b">qwen2.5-coder:14b</option>
+                    <option value="qwen2.5-coder:7b">qwen2.5-coder:7b</option>
+                </select>
+            </td>
         </tr>
     </table>
 
