@@ -1,4 +1,4 @@
-package com.vdzon.aicode
+package com.vdzon.aicode.slackintegration
 
 import com.vdzon.aicode.bots.codereview.CodeReviewBot
 import org.slf4j.LoggerFactory

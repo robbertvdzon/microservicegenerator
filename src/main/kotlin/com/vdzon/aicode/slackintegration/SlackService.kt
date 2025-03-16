@@ -1,11 +1,10 @@
-package com.vdzon.aicode
+package com.vdzon.aicode.slackintegration
 
 import com.slack.api.Slack
 import com.slack.api.methods.request.chat.ChatPostMessageRequest
 import com.slack.api.methods.request.conversations.ConversationsHistoryRequest
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import java.time.Instant
 
 @Service
 class SlackService(

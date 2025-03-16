@@ -2,7 +2,7 @@ package com.vdzon.aicode.bots.codereview
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.vdzon.aicode.GithubService
+import com.vdzon.aicode.git.GithubService
 import com.vdzon.aicode.aiengine.AiEngineFactory
 import com.vdzon.aicode.aiengine.util.JsonSchemaHelper
 import com.vdzon.aicode.bots.AIBot
