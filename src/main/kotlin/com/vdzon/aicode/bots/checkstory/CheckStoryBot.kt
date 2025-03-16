@@ -15,9 +15,10 @@ class CheckStoryBot(): AIBot {
     override fun run(args: Array<String>): String{
         val repo = args.getOrNull(1) ?: throw RuntimeException("Invalid repo")
         val mainbranch = args.getOrNull(2) ?: throw RuntimeException("Invalid main branch")
-        val story = args.getOrNull(3) ?: throw RuntimeException("Invalid story")
-        val engine = args.getOrNull(4) ?: throw RuntimeException("Invalid engine")
-        val model = args.getOrNull(5) ?: throw RuntimeException("Invalid model")
+        val featurebranch = args.getOrNull(3) ?: throw RuntimeException("feature branch")
+        val story = args.getOrNull(4) ?: throw RuntimeException("Invalid story")
+        val engine = args.getOrNull(5) ?: throw RuntimeException("Invalid engine")
+        val model = args.getOrNull(6) ?: throw RuntimeException("Invalid model")
 
         val tokenGenerator = Tokens()
         val aiEngine= AiEngineFactory.getAiEngine(engine, model)
@@ -39,15 +40,17 @@ class CheckStoryBot(): AIBot {
 
         val endTime = System.currentTimeMillis()
 
-        println("Ai finished in: ${endTime - startTime} ms")
-
-        println("\nComments about story: ")
-        println(aiResponse.commentsAboutStory)
-        println("\nNew suggested story name: ")
-        println(aiResponse.newSuggestedStoryName)
-        println("\nNew suggested body: ")
-        println(aiResponse.newSuggestedStoryBody)
-        return "DONE.."
+        val output = buildString {
+            append("Ai finished in: ${endTime - startTime} ms\n\n")
+            append("\nComments about story: ")
+            append(aiResponse.commentsAboutStory)
+            append("\nNew suggested story name: ")
+            append(aiResponse.newSuggestedStoryName)
+            append("\nNew suggested body: ")
+            append(aiResponse.newSuggestedStoryBody)
+        }
+        println(output)
+        return output
 
     }
 

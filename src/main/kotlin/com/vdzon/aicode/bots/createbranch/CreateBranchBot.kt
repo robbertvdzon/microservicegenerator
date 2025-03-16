@@ -62,10 +62,14 @@ class CreateBranchBot(
         githubService.removeFromGit(git, aiResponse.removedSourceFiles,"generated")
         githubService.commit(git, aiResponse.commitMessage)
         githubService.pushToNewRemoteBranch("/tmp/ai-repo", featurebranch)
-        println("\nExplanation from AI:")
-        print(aiResponse.explanationOfCodeChanges)
 
-        return "DONE.."
+        val output = buildString {
+            append("Ai finished in: ${endTime - startTime} ms\n\n")
+            append("\nExplanation from AI:")
+            append(aiResponse.explanationOfCodeChanges)
+        }
+        println(output)
+        return output
 
     }
 

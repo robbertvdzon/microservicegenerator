@@ -42,8 +42,6 @@ class CodeGeneratorBot(
         val aiResponse: AiResponse = jacksonObjectMapper().readValue(jsonResponse,object : TypeReference<AiResponse>() {})
         val endTime = System.currentTimeMillis()
 
-        println("Ai finished in: ${endTime - startTime} ms, ${aiResponse.newSourceFiles.size} new files, ${aiResponse.modifiedSourceFiles.size} modified files, ${aiResponse.removedSourceFiles.size} removed files")
-
         val git = githubService.cloneRepo(
             repo,
             featurebranch,
@@ -57,10 +55,17 @@ class CodeGeneratorBot(
         githubService.removeFromGit(git, aiResponse.removedSourceFiles,"generated")
         githubService.commit(git, aiResponse.commitMessage)
         githubService.push("/tmp/ai-repo")
-        println("\nExplanation from AI:")
-        print(aiResponse.explanationOfCodeChanges)
 
-        return "DONE.."
+
+
+        val output = buildString {
+            append("Ai finished in: ${endTime - startTime} ms\n\n")
+            append("\nExplanation from AI:")
+            append(aiResponse.explanationOfCodeChanges)
+        }
+        println(output)
+        return output
+
 
 
     }
@@ -70,6 +75,7 @@ class CodeGeneratorBot(
         val basePath = "/tmp/ai-repo/generated"
         for (file in sourceFiles) {
             val filePath = "$basePath/${file.sourceFilename.path}/${file.sourceFilename.filename}"
+            println("Saving : $filePath")
             Files.createDirectories(Paths.get("$basePath/${file.sourceFilename.path}"))
             File(filePath).writeText(file.body)
             println("Bestand opgeslagen: $filePath")
