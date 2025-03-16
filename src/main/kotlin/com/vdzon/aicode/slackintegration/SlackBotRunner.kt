@@ -30,12 +30,12 @@ class SlackBotRunner(private val slackService: SlackService) {
         val story = details["story"] ?: "unknown"
         val engine = details["engine"] ?: "unknown"
         val model = details["model"] ?: "unknown"
-        val bot = CodeReviewBot()
-        val args = listOf("",repo, mainbranch, featurebranch, story, engine, model)
 
         val props = details.map { (key, value) -> "$key: $value" }.joinToString("\n")
         slackService.sendMessage("Code review gestart met de volgende properties: \n$props")
 
+        val args = listOf("",repo, mainbranch, featurebranch, story, engine, model)
+        val bot = CodeReviewBot()
         val result = bot.run(args.toTypedArray())
         slackService.sendMessage("code review finished: \n$result")
 

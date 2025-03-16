@@ -1,5 +1,6 @@
 package com.vdzon.aicode.web
 
+import com.vdzon.aicode.bots.codereview.CodeReviewBot
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.*
 import org.springframework.stereotype.Controller
@@ -20,14 +21,20 @@ class WebController {
 
 @RestController
 @RequestMapping("/api")
-class SlackBotApiController {
+class SlackBotApiController() {
 
     private val log = LoggerFactory.getLogger(SlackBotApiController::class.java)
 
     @PostMapping("/codereview")
     fun handleCodeReview(@RequestBody request: CodeRequest): String {
         log.info("Code Review ontvangen: $request")
-        return "Code Review gestart voor ${request.repo} op ${request.featurebranch}"
+
+
+        val args = listOf("",request.repo, request.mainbranch, request.featurebranch, request.story, request.engine, request.model)
+        val bot = CodeReviewBot() // TODO: via Spring  inject4eren
+        val result = bot.run(args.toTypedArray())
+
+        return "Code Review gestart voor ${request.repo} op ${request.featurebranch}\n$result"
     }
 
     @PostMapping("/createbranch")
