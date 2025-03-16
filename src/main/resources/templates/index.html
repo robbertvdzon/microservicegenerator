@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slack Bot Control</title>
+    <script>
+        // Sla invoer op in cookies
+        function saveToCookies() {
+            document.querySelectorAll("input").forEach(input => {
+                document.cookie = input.id + "=" + encodeURIComponent(input.value) + "; path=/";
+            });
+        }
+
+        // Haal waarden op uit cookies
+        function loadFromCookies() {
+            document.cookie.split("; ").forEach(cookie => {
+                let [name, value] = cookie.split("=");
+                if (document.getElementById(name)) {
+                    document.getElementById(name).value = decodeURIComponent(value);
+                }
+            });
+        }
+
+        // Stuur data naar de backend
+        function sendRequest(endpoint) {
+            saveToCookies(); // Eerst de cookies opslaan
+
+            let data = {
+                repo: document.getElementById("repo").value,
+                mainbranch: document.getElementById("mainbranch").value,
+                featurebranch: document.getElementById("featurebranch").value,
+                story: document.getElementById("story").value,
+                engine: document.getElementById("engine").value,
+                model: document.getElementById("model").value
+            };
+
+            fetch(endpoint, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.text())
+                .then(message => alert(message))
+                .catch(error => console.error("Error:", error));
+        }
+
+        // Laad de eerder ingevoerde waarden bij het openen
+        window.onload = loadFromCookies;
+    </script>
+</head>
+<body>
+<h2>Slack Bot Control</h2>
+
+<label for="repo">Repo:</label>
+<input type="text" id="repo"><br>
+
+<label for="mainbranch">Main Branch:</label>
+<input type="text" id="mainbranch"><br>
+
+<label for="featurebranch">Feature Branch:</label>
+<input type="text" id="featurebranch"><br>
+
+<label for="story">Story:</label>
+<input type="text" id="story"><br>
+
+<label for="engine">Engine:</label>
+<input type="text" id="engine"><br>
+
+<label for="model">Model:</label>
+<input type="text" id="model"><br>
+
+<button onclick="sendRequest('/api/codereview')">Code Review</button>
+<button onclick="sendRequest('/api/createbranch')">Create Branch</button>
+</body>
+</html>

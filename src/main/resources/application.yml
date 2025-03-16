@@ -1,3 +1,6 @@
+server:
+  port: 8033
+
 slack:
   bot:
     token: ${SLACK_BOT_TOKEN}

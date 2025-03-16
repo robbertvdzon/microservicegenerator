@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 
-@Component
+//@Component
 class SlackBotRunner(private val slackService: SlackService) {
 
     private val log = LoggerFactory.getLogger(SlackBotRunner::class.java)
