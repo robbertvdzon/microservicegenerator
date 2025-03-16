@@ -12,9 +12,7 @@ class SlackService(
     @Value("\${slack.channel.id}") private val channelId: String
 ) {
     private val slack = Slack.getInstance()
-//    private var lastProcessedTimestamp: String? = null
 
-    /** Haalt nieuwe opdrachten op sinds het laatste verwerkte bericht **/
     fun getNewCommands(): String? {
         val response = slack.methods(slackToken).conversationsHistory(
             ConversationsHistoryRequest.builder()
@@ -24,14 +22,8 @@ class SlackService(
         )
 
         val newMessages = response.messages
-//            ?.filter { it.ts > (lastProcessedTimestamp ?: "0") } // Negeer oude berichten
             ?.map { it.text }
             ?: emptyList()
-
-//        if (newMessages.isNotEmpty()) {
-//            lastProcessedTimestamp = response.messages?.firstOrNull()?.ts // Update laatste timestamp
-//        }
-
         return newMessages.lastOrNull()
     }
 

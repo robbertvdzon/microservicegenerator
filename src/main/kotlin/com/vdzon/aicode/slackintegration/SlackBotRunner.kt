@@ -5,12 +5,12 @@ import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 
-//@Component
+@Component
 class SlackBotRunner(private val slackService: SlackService) {
 
     private val log = LoggerFactory.getLogger(SlackBotRunner::class.java)
 
-    /** Elke 5 seconden checken op nieuwe opdrachten **/
+    /** Elke 3 seconden checken op nieuwe opdrachten **/
     @Scheduled(fixedRate = 3000)
     fun listenForCommands() {
         val command = slackService.getNewCommands()?:""
@@ -23,8 +23,8 @@ class SlackBotRunner(private val slackService: SlackService) {
     /** Simuleert de verwerking van een code review **/
     private fun processCodeReview(command: String) {
         val details = parseCommand(command)
-//        val repo = details["repo"] ?: "unknown"
-        val repo = "git@github.com:robbertvdzon/sample-generated-ai-project.git" // TODO Dit parsen!!!!!!!!
+        val repo = details["repo"] ?: "unknown"
+//        val repo = "git@github.com:robbertvdzon/sample-generated-ai-project.git" // TODO Dit parsen!!!!!!!!
         val mainbranch = details["mainbranch"] ?: "unknown"
         val featurebranch = details["featurebranch"] ?: "unknown"
         val story = details["story"] ?: "unknown"
@@ -47,8 +47,9 @@ class SlackBotRunner(private val slackService: SlackService) {
         return command.split("\n")
             .filter { it.contains(":") }
             .associate {
-                val (key, value) = it.split(":")
+                val (key, value) = it.split(":", limit = 2) // Maximaal 2 delen
                 key.trim() to value.trim()
             }
     }
+
 }
