@@ -22,7 +22,7 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            width: 800px; /* Dubbele breedte */
+            width: 800px; /* Brede container */
         }
 
         h1 {
@@ -32,6 +32,7 @@
             padding: 15px;
             margin: 0;
             border-radius: 8px 8px 0 0;
+            width: 800px; /* Zelfde breedte als de container */
         }
 
         table {
@@ -73,16 +74,40 @@
         button:hover {
             background-color: #0056b3;
         }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            font-size: 16px;
+            text-align: left;
+            font-weight: normal;
+            min-height: 40px;
+            white-space: pre-wrap; /* Zorgt ervoor dat enters en lege regels behouden blijven */
+            word-wrap: break-word;
+        }
+
+        .loading {
+            color: #ff9800;
+            font-weight: bold;
+        }
+
+        .success {
+            color: #28a745;
+        }
+
+        .error {
+            color: #dc3545;
+        }
     </style>
     <script>
-        // Sla invoer op in cookies
         function saveToCookies() {
             document.querySelectorAll("input, select").forEach(input => {
                 document.cookie = input.id + "=" + encodeURIComponent(input.value) + "; path=/";
             });
         }
 
-        // Haal waarden op uit cookies
         function loadFromCookies() {
             document.cookie.split("; ").forEach(cookie => {
                 let [name, value] = cookie.split("=");
@@ -92,7 +117,6 @@
             });
         }
 
-        // Stuur data naar de backend
         function sendRequest(endpoint) {
             saveToCookies(); // Eerst de cookies opslaan
 
@@ -105,18 +129,30 @@
                 model: document.getElementById("model").value
             };
 
+            let resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = "Bezig met verwerken...";
+            resultDiv.className = "loading";
+
             fetch(endpoint, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data)
             })
                 .then(response => response.text())
-                .then(message => alert(message))
-                .catch(error => console.error("Error:", error));
+                .then(message => {
+                    resultDiv.innerHTML = message;
+                    resultDiv.className = "success";
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = "Er is een fout opgetreden: " + error;
+                    resultDiv.className = "error";
+                });
         }
 
-        // Laad de eerder ingevoerde waarden bij het openen
-        window.onload = loadFromCookies;
+        window.onload = function() {
+            loadFromCookies();
+            document.getElementById("result").innerHTML = ""; // Maak de resultaten-sectie leeg bij het laden
+        };
     </script>
 </head>
 <body>
@@ -169,6 +205,8 @@
         <button onclick="sendRequest('/api/codereview')">Code Review</button>
         <button onclick="sendRequest('/api/createbranch')">Create Branch</button>
     </div>
+
+    <div id="result"></div>
 </div>
 
 </body>
