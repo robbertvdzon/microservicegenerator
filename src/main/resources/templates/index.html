@@ -4,6 +4,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slack Bot Control</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+
+        h1 {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin: 0;
+            border-radius: 8px 8px 0 0;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        td {
+            padding: 8px;
+            vertical-align: middle;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            width: 45%;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
     <script>
         // Sla invoer op in cookies
         function saveToCookies() {
@@ -50,27 +119,42 @@
     </script>
 </head>
 <body>
-<h2>Slack Bot Control</h2>
 
-<label for="repo">Repo:</label>
-<input type="text" id="repo"><br>
+<h1>Programmers AI Co-Writer</h1>
 
-<label for="mainbranch">Main Branch:</label>
-<input type="text" id="mainbranch"><br>
+<div class="container">
+    <table>
+        <tr>
+            <td><label for="repo">Repo:</label></td>
+            <td><input type="text" id="repo"></td>
+        </tr>
+        <tr>
+            <td><label for="mainbranch">Main Branch:</label></td>
+            <td><input type="text" id="mainbranch"></td>
+        </tr>
+        <tr>
+            <td><label for="featurebranch">Feature Branch:</label></td>
+            <td><input type="text" id="featurebranch"></td>
+        </tr>
+        <tr>
+            <td><label for="story">Story:</label></td>
+            <td><input type="text" id="story"></td>
+        </tr>
+        <tr>
+            <td><label for="engine">Engine:</label></td>
+            <td><input type="text" id="engine"></td>
+        </tr>
+        <tr>
+            <td><label for="model">Model:</label></td>
+            <td><input type="text" id="model"></td>
+        </tr>
+    </table>
 
-<label for="featurebranch">Feature Branch:</label>
-<input type="text" id="featurebranch"><br>
+    <div class="button-container">
+        <button onclick="sendRequest('/api/codereview')">Code Review</button>
+        <button onclick="sendRequest('/api/createbranch')">Create Branch</button>
+    </div>
+</div>
 
-<label for="story">Story:</label>
-<input type="text" id="story"><br>
-
-<label for="engine">Engine:</label>
-<input type="text" id="engine"><br>
-
-<label for="model">Model:</label>
-<input type="text" id="model"><br>
-
-<button onclick="sendRequest('/api/codereview')">Code Review</button>
-<button onclick="sendRequest('/api/createbranch')">Create Branch</button>
 </body>
 </html>
