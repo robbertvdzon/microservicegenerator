@@ -105,15 +105,17 @@ class GithubService() {
 
     fun addToGit(git: Git, names: List<SourceFileName>, prefix: String) {
         names.forEach {
-            println("adding $prefix/${it.path}/${it.filename}")
-            git.add().addFilepattern("$prefix/${it.path}/${it.filename}").call()
+            val fullName = "$prefix/${it.path}/${it.filename}".replace("//","/")
+            println("adding $fullName")
+            git.add().addFilepattern(fullName).call()
         }
     }
 
     fun removeFromGit(git: Git, names: List<SourceFileName>, prefix: String) {
         names.forEach {
-            println("removing $prefix/${it.path}/${it.filename}")
-            git.rm().addFilepattern("$prefix/${it.path}/${it.filename}").call()
+            val fullName = "$prefix/${it.path}/${it.filename}".replace("//","/")
+            println("removing $fullName")
+            git.rm().addFilepattern(fullName).call()
         }
     }
 
@@ -124,6 +126,16 @@ class GithubService() {
 
     fun push(localDir: String): Boolean {
         val process = ProcessBuilder("git", "push", "origin", "HEAD")
+            .directory(File(localDir))
+            .redirectErrorStream(true)
+            .start()
+        val output = process.inputStream.bufferedReader().use { it.readText() }
+        val exitCode = process.waitFor()
+        return exitCode == 0
+    }
+
+    fun pushToNewRemoteBranch(localDir: String, branch: String): Boolean {
+        val process = ProcessBuilder("git", "push", "--set-upstream", "origin", branch)
             .directory(File(localDir))
             .redirectErrorStream(true)
             .start()
