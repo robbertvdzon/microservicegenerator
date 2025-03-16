@@ -4,5 +4,5 @@ interface AIBot {
     fun getName(): String
     fun getDescription(): String
     fun getHelp(): String
-    fun run(args: Array<String>)
+    fun run(args: Array<String>): String
 }

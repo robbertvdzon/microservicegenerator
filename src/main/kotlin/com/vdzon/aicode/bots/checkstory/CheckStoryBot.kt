@@ -12,7 +12,7 @@ class CheckStoryBot(): AIBot {
     override fun getName(): String = "check_story"
     override fun getDescription(): String = "Check the story"
     override fun getHelp(): String = "check_story githubrepo mainbranch story engine model"
-    override fun run(args: Array<String>){
+    override fun run(args: Array<String>): String{
         val repo = args.getOrNull(1) ?: throw RuntimeException("Invalid repo")
         val mainbranch = args.getOrNull(2) ?: throw RuntimeException("Invalid main branch")
         val story = args.getOrNull(3) ?: throw RuntimeException("Invalid story")
@@ -47,6 +47,8 @@ class CheckStoryBot(): AIBot {
         println(aiResponse.newSuggestedStoryName)
         println("\nNew suggested body: ")
         println(aiResponse.newSuggestedStoryBody)
+        return "DONE.."
+
     }
 
 

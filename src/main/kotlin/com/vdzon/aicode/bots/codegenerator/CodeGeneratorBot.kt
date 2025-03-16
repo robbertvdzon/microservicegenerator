@@ -16,7 +16,7 @@ class CodeGeneratorBot(
     override fun getName(): String = "implement_story"
     override fun getDescription(): String = "Implement a story"
     override fun getHelp(): String = "implement_story githubrepo mainbranch featurebranch story engine model"
-    override fun run(args: Array<String>){
+    override fun run(args: Array<String>): String{
         val repo = args.getOrNull(1) ?: throw RuntimeException("Invalid repo")
         val mainbranch = args.getOrNull(2) ?: throw RuntimeException("Invalid main branch")
         val featurebranch = args.getOrNull(3) ?: throw RuntimeException("feature branch")
@@ -59,6 +59,9 @@ class CodeGeneratorBot(
         githubService.push("/tmp/ai-repo")
         println("\nExplanation from AI:")
         print(aiResponse.explanationOfCodeChanges)
+
+        return "DONE.."
+
 
     }
 

@@ -17,7 +17,7 @@ class CreateBranchBot(
     override fun getName(): String = "create_branch"
     override fun getDescription(): String = "Implement a story"
     override fun getHelp(): String = "create_branch githubrepo mainbranch featurebranch story engine model"
-    override fun run(args: Array<String>){
+    override fun run(args: Array<String>): String{
         val repo = args.getOrNull(1) ?: throw RuntimeException("Invalid repo")
         val mainbranch = args.getOrNull(2) ?: throw RuntimeException("Invalid main branch")
         val featurebranch = args.getOrNull(3) ?: throw RuntimeException("feature branch")
@@ -64,6 +64,8 @@ class CreateBranchBot(
         githubService.pushToNewRemoteBranch("/tmp/ai-repo", featurebranch)
         println("\nExplanation from AI:")
         print(aiResponse.explanationOfCodeChanges)
+
+        return "DONE.."
 
     }
 

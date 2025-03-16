@@ -12,7 +12,7 @@ class CodeReviewBot(
     override fun getName(): String = "code_review"
     override fun getDescription(): String = "Code review a story"
     override fun getHelp(): String = "code_review githubrepo mainbranch featurebranch story engine model"
-    override fun run(args: Array<String>){
+    override fun run(args: Array<String>): String{
         val repo = args.getOrNull(1) ?: throw RuntimeException("Invalid repo")
         val mainbranch = args.getOrNull(2) ?: throw RuntimeException("Invalid main branch")
         val featurebranch = args.getOrNull(3) ?: throw RuntimeException("feature branch")
@@ -38,17 +38,20 @@ class CodeReviewBot(
         val aiResponse: AiResponse = jacksonObjectMapper().readValue(jsonResponse,object : TypeReference<AiResponse>() {})
         val endTime = System.currentTimeMillis()
 
-        println("Ai finished in: ${endTime - startTime} ms")
+        val output = buildString {
+            append("Ai finished in: ${endTime - startTime} ms\n\n")
+            append("Review response for each file:\n")
 
-        println("\nReview response for each file:")
-        aiResponse.filesWithComments?.forEach {
-            println("File: ${it.sourceFilename?.filename}")
-            println(it.codeReviewComments)
-            println()
+            aiResponse.filesWithComments?.forEach {
+                append("File: ${it.sourceFilename?.filename}\n")
+                append("${it.codeReviewComments}\n\n")
+            }
+
+            append("General code review comments:\n")
+            append(aiResponse.generalCodeReviewComments)
         }
-        println("General code review comments:")
-        print(aiResponse.generalCodeReviewComments)
-
+        println(output)
+        return output
     }
 
 
