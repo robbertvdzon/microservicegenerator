@@ -14,11 +14,12 @@ class CheckStoryBot(): AIBot {
     override fun getHelp(): String = "check_story githubrepo mainbranch story engine model"
     override fun run(args: Array<String>): String{
         val repo = args.getOrNull(1) ?: throw RuntimeException("Invalid repo")
-        val mainbranch = args.getOrNull(2) ?: throw RuntimeException("Invalid main branch")
-        val featurebranch = args.getOrNull(3) ?: throw RuntimeException("feature branch")
-        val story = args.getOrNull(4) ?: throw RuntimeException("Invalid story")
-        val engine = args.getOrNull(5) ?: throw RuntimeException("Invalid engine")
-        val model = args.getOrNull(6) ?: throw RuntimeException("Invalid model")
+        val sourceFolder = args.getOrNull(2) ?: throw RuntimeException("Invalid sourceFolder")
+        val mainbranch = args.getOrNull(3) ?: throw RuntimeException("Invalid main branch")
+        val featurebranch = args.getOrNull(4) ?: throw RuntimeException("feature branch")
+        val story = args.getOrNull(5) ?: throw RuntimeException("Invalid story")
+        val engine = args.getOrNull(6) ?: throw RuntimeException("Invalid engine")
+        val model = args.getOrNull(7) ?: throw RuntimeException("Invalid model")
 
         val tokenGenerator = Tokens()
         val aiEngine= AiEngineFactory.getAiEngine(engine, model)
@@ -28,7 +29,7 @@ class CheckStoryBot(): AIBot {
         val storyToImplement = githubService.getTicket(repo, story)
         println("Story to implement: ${storyToImplement.title}")
         println("${storyToImplement.body}")
-        val mainCode = githubService.getSerializedRepo(mainbranch)
+        val mainCode = githubService.getSerializedRepo(repo, mainbranch, sourceFolder)
         println("calling AI model..")
 
         val startTime = System.currentTimeMillis()

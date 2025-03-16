@@ -18,11 +18,12 @@ class CodeGeneratorBot(
     override fun getHelp(): String = "implement_story githubrepo mainbranch featurebranch story engine model"
     override fun run(args: Array<String>): String{
         val repo = args.getOrNull(1) ?: throw RuntimeException("Invalid repo")
-        val mainbranch = args.getOrNull(2) ?: throw RuntimeException("Invalid main branch")
-        val featurebranch = args.getOrNull(3) ?: throw RuntimeException("feature branch")
-        val story = args.getOrNull(4) ?: throw RuntimeException("Invalid story")
-        val engine = args.getOrNull(5) ?: throw RuntimeException("Invalid engine")
-        val model = args.getOrNull(6) ?: throw RuntimeException("Invalid model")
+        val sourceFolder = args.getOrNull(2) ?: throw RuntimeException("Invalid sourceFolder")
+        val mainbranch = args.getOrNull(3) ?: throw RuntimeException("Invalid main branch")
+        val featurebranch = args.getOrNull(4) ?: throw RuntimeException("feature branch")
+        val story = args.getOrNull(5) ?: throw RuntimeException("Invalid story")
+        val engine = args.getOrNull(6) ?: throw RuntimeException("Invalid engine")
+        val model = args.getOrNull(7) ?: throw RuntimeException("Invalid model")
 
         val tokenGenerator = Tokens()
         val aiEngine= AiEngineFactory.getAiEngine(engine, model)
@@ -30,8 +31,8 @@ class CodeGeneratorBot(
 
         println("\nStart generating code..")
         val storyToImplement = githubService.getTicket(repo, story)
-        val mainCode = githubService.getSerializedRepo(mainbranch)
-        val branch = githubService.getSerializedRepo(featurebranch)
+        val mainCode = githubService.getSerializedRepo(repo, mainbranch, sourceFolder)
+        val branch = githubService.getSerializedRepo(repo, featurebranch, sourceFolder)
         println("calling AI model..")
 
         val startTime = System.currentTimeMillis()
@@ -48,11 +49,11 @@ class CodeGeneratorBot(
             "/tmp/ai-repo"
         )
         println("Saving and pushing generated files..")
-        saveGeneratedFiles(aiResponse.newSourceFiles)
-        saveGeneratedFiles(aiResponse.modifiedSourceFiles)
-        githubService.addToGit(git, aiResponse.newSourceFiles.map { it.sourceFilename },"generated")
-        githubService.addToGit(git, aiResponse.modifiedSourceFiles.map { it.sourceFilename },"generated")
-        githubService.removeFromGit(git, aiResponse.removedSourceFiles,"generated")
+        saveGeneratedFiles(sourceFolder, aiResponse.newSourceFiles)
+        saveGeneratedFiles(sourceFolder, aiResponse.modifiedSourceFiles)
+        githubService.addToGit(git, aiResponse.newSourceFiles.map { it.sourceFilename },sourceFolder)
+        githubService.addToGit(git, aiResponse.modifiedSourceFiles.map { it.sourceFilename },sourceFolder)
+        githubService.removeFromGit(git, aiResponse.removedSourceFiles,sourceFolder)
         githubService.commit(git, aiResponse.commitMessage)
         githubService.push("/tmp/ai-repo")
 
@@ -71,10 +72,10 @@ class CodeGeneratorBot(
     }
 
 
-    fun saveGeneratedFiles(sourceFiles: List<SourceFile>) {
-        val basePath = "/tmp/ai-repo/generated"
+    fun saveGeneratedFiles(sourceFolder: String, sourceFiles: List<SourceFile>) {
+        val basePath = "/tmp/ai-repo/${sourceFolder}"
         for (file in sourceFiles) {
-            val filePath = "$basePath/${file.sourceFilename.path}/${file.sourceFilename.filename}"
+            val filePath = "$basePath/${file.sourceFilename.path}/${file.sourceFilename.filename}".replace("//","/")
             println("Saving : $filePath")
             Files.createDirectories(Paths.get("$basePath/${file.sourceFilename.path}"))
             File(filePath).writeText(file.body)

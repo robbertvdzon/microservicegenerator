@@ -122,6 +122,7 @@
 
             let data = {
                 repo: document.getElementById("repo").value,
+                sourcefolder: document.getElementById("sourcefolder").value,
                 mainbranch: document.getElementById("mainbranch").value,
                 featurebranch: document.getElementById("featurebranch").value,
                 story: document.getElementById("story").value,
@@ -164,6 +165,10 @@
         <tr>
             <td><label for="repo">Repo:</label></td>
             <td><input type="text" id="repo"></td>
+        </tr>
+        <tr>
+            <td><label for="sourcefolder">Source folder:</label></td>
+            <td><input type="text" id="sourcefolder"></td>
         </tr>
         <tr>
             <td><label for="mainbranch">Main Branch:</label></td>

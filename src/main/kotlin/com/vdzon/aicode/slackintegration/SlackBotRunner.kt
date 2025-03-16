@@ -13,7 +13,7 @@ class SlackBotRunner(private val slackService: SlackService) {
     /** Elke 3 seconden checken op nieuwe opdrachten **/
     @Scheduled(fixedRate = 3000)
     fun listenForCommands() {
-        val command = slackService.getNewCommands()?:""
+        val command = slackService.getNewCommands() ?: ""
         if (command.startsWith("code_review:")) {
             log.info("Nieuwe code review opdracht ontvangen: $command")
             val response = processCodeReview(command)
@@ -24,7 +24,7 @@ class SlackBotRunner(private val slackService: SlackService) {
     private fun processCodeReview(command: String) {
         val details = parseCommand(command)
         val repo = details["repo"] ?: "unknown"
-//        val repo = "git@github.com:robbertvdzon/sample-generated-ai-project.git" // TODO Dit parsen!!!!!!!!
+        val sourceFolder = details["sourceFolder"] ?: "unknown"
         val mainbranch = details["mainbranch"] ?: "unknown"
         val featurebranch = details["featurebranch"] ?: "unknown"
         val story = details["story"] ?: "unknown"
@@ -34,7 +34,7 @@ class SlackBotRunner(private val slackService: SlackService) {
         val props = details.map { (key, value) -> "$key: $value" }.joinToString("\n")
         slackService.sendMessage("Code review gestart met de volgende properties: \n$props")
 
-        val args = listOf("",repo, mainbranch, featurebranch, story, engine, model)
+        val args = listOf("", repo, sourceFolder, mainbranch, featurebranch, story, engine, model)
         val bot = CodeReviewBot()
         val result = bot.run(args.toTypedArray())
         slackService.sendMessage("code review finished: \n$result")
