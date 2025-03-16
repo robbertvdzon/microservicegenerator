@@ -20,6 +20,7 @@ class CodeReviewBot(
         val story = args.getOrNull(5) ?: throw RuntimeException("Invalid story")
         val engine = args.getOrNull(6) ?: throw RuntimeException("Invalid engine")
         val model = args.getOrNull(7) ?: throw RuntimeException("Invalid model")
+        val question = args.getOrNull(8) ?: throw RuntimeException("Invalid question")
 
         val tokenGenerator = Tokens()
         val aiEngine= AiEngineFactory.getAiEngine(engine, model)

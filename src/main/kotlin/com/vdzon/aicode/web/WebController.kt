@@ -1,5 +1,6 @@
 package com.vdzon.aicode.web
 
+import com.vdzon.aicode.bots.askquestion.QuestionBot
 import com.vdzon.aicode.bots.checkstory.CheckStoryBot
 import com.vdzon.aicode.bots.codegenerator.CodeGeneratorBot
 import com.vdzon.aicode.bots.codereview.CodeReviewBot
@@ -39,7 +40,8 @@ class SlackBotApiController() {
             request.featurebranch,
             request.story,
             request.engine,
-            request.model
+            request.model,
+            request.question,
         )
         val bot = CodeReviewBot() // TODO: via Spring  inject4eren
         val result = bot.run(args.toTypedArray())
@@ -57,7 +59,8 @@ class SlackBotApiController() {
             request.featurebranch,
             request.story,
             request.engine,
-            request.model
+            request.model,
+            request.question,
         )
         val bot = CreateBranchBot() // TODO: via Spring  inject4eren
         val result = bot.run(args.toTypedArray())
@@ -75,9 +78,29 @@ class SlackBotApiController() {
             request.featurebranch,
             request.story,
             request.engine,
-            request.model
+            request.model,
+            request.question,
         )
         val bot = CodeGeneratorBot() // TODO: via Spring  inject4eren
+        val result = bot.run(args.toTypedArray())
+        return result
+    }
+
+    @PostMapping("/askquestion")
+    fun handleAskQuestion(@RequestBody request: CodeRequest): String {
+        log.info("Question ontvangen: $request")
+        val args = listOf(
+            "",
+            request.repo,
+            request.sourcefolder,
+            request.mainbranch,
+            request.featurebranch,
+            request.story,
+            request.engine,
+            request.model,
+            request.question,
+        )
+        val bot = QuestionBot() // TODO: via Spring  inject4eren
         val result = bot.run(args.toTypedArray())
         return result
     }
@@ -111,5 +134,6 @@ data class CodeRequest(
     val featurebranch: String,
     val story: String,
     val engine: String,
-    val model: String
+    val model: String,
+    val question: String,
 )

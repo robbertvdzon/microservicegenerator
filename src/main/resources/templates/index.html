@@ -127,7 +127,8 @@
                 featurebranch: document.getElementById("featurebranch").value,
                 story: document.getElementById("story").value,
                 engine: document.getElementById("engine").value,
-                model: document.getElementById("model").value
+                model: document.getElementById("model").value,
+                question: document.getElementById("question").value,
             };
 
             let resultDiv = document.getElementById("result");
@@ -204,6 +205,10 @@
                 </select>
             </td>
         </tr>
+        <tr>
+            <td><label for="question">Question:</label></td>
+            <td><input type="text" id="question"></td>
+        </tr>
     </table>
 
     <div class="button-container">
@@ -211,6 +216,7 @@
         <button onclick="sendRequest('/api/createbranch')">Create Branch</button>
         <button onclick="sendRequest('/api/checkstory')">Check story</button>
         <button onclick="sendRequest('/api/updatebranch')">Update Branch</button>
+        <button onclick="sendRequest('/api/askquestion')">Ask question</button>
     </div>
 
     <div id="result"></div>

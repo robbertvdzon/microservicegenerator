@@ -41,13 +41,7 @@ class GithubService() {
     }
 
     fun getTicket(repoUrl: String, ticket: String): Story {
-        val repoName = if (repoUrl.contains("gitlab"))
-            "git@github.com:robbertvdzon/sample-generated-ai-project" // TODO: implement GitLab support, for now just use the sample-generated-ai-project repo on gitlab
-        else
-            repoUrl.removePrefix("https://github.com/").removeSuffix(".git")
-
-
-
+        val repoName = "git@github.com:robbertvdzon/sample-generated-ai-project" // TODO: Deze configureerbaar maken!
         val command = listOf("gh", "issue", "view", ticket, "--repo", repoName, "--json", "title,body")
 
         val process = ProcessBuilder(command)
