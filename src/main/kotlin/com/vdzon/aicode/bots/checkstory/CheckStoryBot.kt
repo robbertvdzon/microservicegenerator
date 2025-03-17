@@ -6,8 +6,10 @@ import com.vdzon.aicode.git.GithubService
 import com.vdzon.aicode.aiengine.AiEngineFactory
 import com.vdzon.aicode.aiengine.util.JsonSchemaHelper
 import com.vdzon.aicode.bots.AIBot
+import org.springframework.stereotype.Service
 
-class CheckStoryBot(): AIBot {
+@Service
+class CheckStoryBot(val aiEngineFactory: AiEngineFactory): AIBot {
 
     override fun getName(): String = "check_story"
     override fun getDescription(): String = "Check the story"
@@ -23,7 +25,7 @@ class CheckStoryBot(): AIBot {
         val question = args.getOrNull(8) ?: throw RuntimeException("Invalid question")
 
         val tokenGenerator = Tokens()
-        val aiEngine= AiEngineFactory.getAiEngine(engine, model)
+        val aiEngine= aiEngineFactory.getAiEngine(engine)
         val githubService =  GithubService()
 
         println("\nStart generating code..")
@@ -37,7 +39,7 @@ class CheckStoryBot(): AIBot {
         val requestModel = CheckStoryRequest(mainCode!!, storyToImplement)
         val requestJson = jacksonObjectMapper().writeValueAsString(requestModel)
         val jsonSchema: Map<String, Any> = JsonSchemaHelper.generateJsonSchemaAsMap(CheckStoryAiResponse::class.java)
-        val jsonResponse = aiEngine.chat(jsonSchema, tokenGenerator.getSystemToken(), tokenGenerator.getUserToken(requestJson))
+        val jsonResponse = aiEngine.chat(jsonSchema, tokenGenerator.getSystemToken(), tokenGenerator.getUserToken(requestJson), model)
         val aiResponse: CheckStoryAiResponse = jacksonObjectMapper().readValue(jsonResponse,object : TypeReference<CheckStoryAiResponse>() {})
 
         val endTime = System.currentTimeMillis()

@@ -7,10 +7,8 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 
 object JsonSchemaHelper {
     /*
-    Oeioeioei, deze code moet ik heel erg opruimen!
+    TODO: Cleanup this code
      */
-
-
     private data class Schema(
         val id: String,
         val properties: Map<String, Any>,
@@ -20,15 +18,11 @@ object JsonSchemaHelper {
         val objectMapper = jacksonObjectMapper()
         val schemaGen = JsonSchemaGenerator(objectMapper)
         val schema: ObjectSchema = schemaGen.generateSchema(clazz) as ObjectSchema
-
-        // Converteer JSON Schema naar een Map met TypeReference
         val jsonString = objectMapper.writeValueAsString(schema)
         val jsonSchema = objectMapper.readValue(jsonString, object : TypeReference<Map<String, Any>>() {})
         val schemas = findAllSchemas(jsonSchema)
         val newSchema: Map<String, Any> = convertSchema(jsonSchema, schemas)
-        val newSchema2: Map<String, Any> = addRequired(newSchema)
-
-        return newSchema2
+        return addRequired(newSchema)
     }
 
     private fun addRequired(
@@ -49,7 +43,6 @@ object JsonSchemaHelper {
         }
     }
 
-
     private fun convertSchema(
         map: Map<String, Any>,
         schemas: List<Schema>
@@ -59,14 +52,13 @@ object JsonSchemaHelper {
             val rr = when {
                 value is Map<*, *> -> {
                     convertSchema(value as Map<String, Any>, schemas)
-                } // Recursief aanroepen
+                }
                 key.contains("ref") -> {
                     val refs = schemas.firstOrNull { it.id == value }?.properties ?: emptyMap()
                     newKey = "properties"
                     refs
-
-                } // Vervang "$ref" door "DUMMY"
-                else -> value // Laat overige waarden onveranderd
+                }
+                else -> value
             }
             newKey to rr
         }.toMap()

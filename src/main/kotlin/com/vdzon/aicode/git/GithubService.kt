@@ -7,24 +7,12 @@ import com.vdzon.aicode.commonmodel.SourceFile
 import com.vdzon.aicode.commonmodel.SourceFileName
 import com.vdzon.aicode.commonmodel.Story
 import org.eclipse.jgit.api.Git
+import org.springframework.stereotype.Service
 import java.io.BufferedReader
 import java.io.File
 
-//data class GitHubFile(val path: String, val type: String, val url: String?)
-
+@Service
 class GithubService() {
-
-//    val sessionFactory = object : JschConfigSessionFactory() {
-//        override fun configure(host: OpenSshConfig.Host, session: Session) {
-//            session.setConfig("StrictHostKeyChecking", "no") // Voorkom host key problemen
-//        }
-//
-//        override fun createDefaultJSch(fs: FS?): JSch {
-//            val jsch = super.createDefaultJSch(fs)
-//            jsch.addIdentity("/Users/robbertvanderzon/.ssh/id_rsa") // Gebruik je SSH-sleutel
-//            return jsch
-//        }
-//    }
 
     fun getSerializedRepo(repo: String, branch: String, sourceFolder: String): MicroserviceProject? {
         try {

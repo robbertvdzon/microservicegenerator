@@ -6,8 +6,11 @@ import com.vdzon.aicode.git.GithubService
 import com.vdzon.aicode.aiengine.AiEngineFactory
 import com.vdzon.aicode.aiengine.util.JsonSchemaHelper
 import com.vdzon.aicode.bots.AIBot
+import org.springframework.stereotype.Service
 
+@Service
 class QuestionBot(
+    val aiEngineFactory: AiEngineFactory
 ): AIBot {
     override fun getName(): String = "code_review"
     override fun getDescription(): String = "Code review a story"
@@ -23,7 +26,7 @@ class QuestionBot(
         val question = args.getOrNull(8) ?: throw RuntimeException("Invalid question")
 
         val tokenGenerator = Tokens()
-        val aiEngine= AiEngineFactory.getAiEngine(engine, model)
+        val aiEngine= aiEngineFactory.getAiEngine(engine)
         val githubService =  GithubService()
 
         println("\nStart code review..")
@@ -35,7 +38,7 @@ class QuestionBot(
         val requestModel = Request(mainCode!!, branch!!, question)
         val requestJson = jacksonObjectMapper().writeValueAsString(requestModel)
         val jsonSchema: Map<String, Any> = JsonSchemaHelper.generateJsonSchemaAsMap(AiResponse::class.java)
-        val jsonResponse = aiEngine.chat(jsonSchema, tokenGenerator.getSystemToken(), tokenGenerator.getUserToken(requestJson))
+        val jsonResponse = aiEngine.chat(jsonSchema, tokenGenerator.getSystemToken(), tokenGenerator.getUserToken(requestJson), model)
         val aiResponse: AiResponse = jacksonObjectMapper().readValue(jsonResponse,object : TypeReference<AiResponse>() {})
         val endTime = System.currentTimeMillis()
 

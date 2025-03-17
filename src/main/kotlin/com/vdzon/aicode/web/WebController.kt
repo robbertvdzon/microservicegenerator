@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.*
 
 @Controller
 @RequestMapping("/")
-class WebController {
+class WebController(
+) {
 
     private val log = LoggerFactory.getLogger(WebController::class.java)
 
@@ -25,7 +26,13 @@ class WebController {
 
 @RestController
 @RequestMapping("/api")
-class SlackBotApiController() {
+class SlackBotApiController(
+    private val createBranchBot: CreateBranchBot,
+    private val codeReviewBot: CodeReviewBot,
+    private val codeGeneratorBot: CodeGeneratorBot,
+    private val questionBot: QuestionBot,
+    private val checkStoryBot: CheckStoryBot
+) {
 
     private val log = LoggerFactory.getLogger(SlackBotApiController::class.java)
 
@@ -43,7 +50,7 @@ class SlackBotApiController() {
             request.model,
             request.question,
         )
-        val bot = CodeReviewBot() // TODO: via Spring  inject4eren
+        val bot = codeReviewBot
         val result = bot.run(args.toTypedArray())
         return result
     }
@@ -62,7 +69,7 @@ class SlackBotApiController() {
             request.model,
             request.question,
         )
-        val bot = CreateBranchBot() // TODO: via Spring  inject4eren
+        val bot = createBranchBot
         val result = bot.run(args.toTypedArray())
         return result
     }
@@ -81,7 +88,7 @@ class SlackBotApiController() {
             request.model,
             request.question,
         )
-        val bot = CodeGeneratorBot() // TODO: via Spring  inject4eren
+        val bot = codeGeneratorBot
         val result = bot.run(args.toTypedArray())
         return result
     }
@@ -100,7 +107,7 @@ class SlackBotApiController() {
             request.model,
             request.question,
         )
-        val bot = QuestionBot() // TODO: via Spring  inject4eren
+        val bot = questionBot
         val result = bot.run(args.toTypedArray())
         return result
     }
@@ -116,9 +123,10 @@ class SlackBotApiController() {
             request.featurebranch,
             request.story,
             request.engine,
-            request.model
+            request.model,
+            request.question,
         )
-        val bot = CheckStoryBot() // TODO: via Spring  inject4eren
+        val bot = checkStoryBot
         val result = bot.run(args.toTypedArray())
         return result
     }

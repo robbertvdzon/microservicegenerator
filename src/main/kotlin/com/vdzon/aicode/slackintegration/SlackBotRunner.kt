@@ -6,7 +6,10 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 
 @Component
-class SlackBotRunner(private val slackService: SlackService) {
+class SlackBotRunner(
+    private val slackService: SlackService,
+    private val codeReviewBot: CodeReviewBot
+    ) {
 
     private val log = LoggerFactory.getLogger(SlackBotRunner::class.java)
 
@@ -35,7 +38,7 @@ class SlackBotRunner(private val slackService: SlackService) {
         slackService.sendMessage("Code review gestart met de volgende properties: \n$props")
 
         val args = listOf("", repo, sourceFolder, mainbranch, featurebranch, story, engine, model)
-        val bot = CodeReviewBot()
+        val bot = codeReviewBot
         val result = bot.run(args.toTypedArray())
         slackService.sendMessage("code review finished: \n$result")
 

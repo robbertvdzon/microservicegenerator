@@ -7,11 +7,13 @@ import com.vdzon.aicode.aiengine.AiEngineFactory
 import com.vdzon.aicode.aiengine.util.JsonSchemaHelper
 import com.vdzon.aicode.bots.AIBot
 import com.vdzon.aicode.commonmodel.SourceFile
+import org.springframework.stereotype.Service
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 
-class CodeGeneratorBot(
+@Service
+class CodeGeneratorBot(val aiEngineFactory: AiEngineFactory
 ): AIBot {
     override fun getName(): String = "implement_story"
     override fun getDescription(): String = "Implement a story"
@@ -27,7 +29,7 @@ class CodeGeneratorBot(
         val question = args.getOrNull(8) ?: throw RuntimeException("Invalid question")
 
         val tokenGenerator = Tokens()
-        val aiEngine= AiEngineFactory.getAiEngine(engine, model)
+        val aiEngine= aiEngineFactory.getAiEngine(engine)
         val githubService =  GithubService()
 
         println("\nStart generating code..")
@@ -40,7 +42,7 @@ class CodeGeneratorBot(
         val requestModel = Request(mainCode!!, branch!!, storyToImplement)
         val requestJson = jacksonObjectMapper().writeValueAsString(requestModel)
         val jsonSchema: Map<String, Any> = JsonSchemaHelper.generateJsonSchemaAsMap(AiResponse::class.java)
-        val jsonResponse = aiEngine.chat(jsonSchema, tokenGenerator.getSystemToken(), tokenGenerator.getUserToken(requestJson))
+        val jsonResponse = aiEngine.chat(jsonSchema, tokenGenerator.getSystemToken(), tokenGenerator.getUserToken(requestJson), model)
         val aiResponse: AiResponse = jacksonObjectMapper().readValue(jsonResponse,object : TypeReference<AiResponse>() {})
         val endTime = System.currentTimeMillis()
 
