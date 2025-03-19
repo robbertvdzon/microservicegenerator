@@ -43,7 +43,9 @@ class QuestionBot(
         val endTime = System.currentTimeMillis()
 
         val output = buildString {
-            append("Ai finished in: ${endTime - startTime} ms\n\n")
+            append("Ai finished in: ${endTime - startTime} ms\n")
+            append("Engine: $engine}\n")
+            append("Model: ${model}\n\n")
             append("Answer to question:\n")
             append(aiResponse.answer)
         }
