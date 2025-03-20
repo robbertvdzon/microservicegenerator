@@ -26,6 +26,18 @@ class SlackService(
             ?: emptyList()
         return newMessages.lastOrNull()
     }
+    fun getAllCommands(): List<String> {
+        val response = slack.methods(slackToken).conversationsHistory(
+            ConversationsHistoryRequest.builder()
+                .channel(channelId)
+                .build()
+        )
+
+        val allMessages = response.messages
+            ?.map { it.text }
+            ?: emptyList()
+        return allMessages
+    }
 
     /** Stuurt een bericht terug naar het Slack-kanaal **/
     fun sendMessage(text: String) {
