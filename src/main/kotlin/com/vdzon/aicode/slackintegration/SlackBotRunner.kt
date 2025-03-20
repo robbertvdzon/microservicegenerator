@@ -23,7 +23,7 @@ class SlackBotRunner(
     fun init() {
         println("Find last context")
         val messages = slackService.getAllCommands()
-        val lastContext = messages.filter { it.startsWith("context:") }.firstOrNull()
+        val lastContext = messages.filter { it.startsWith("#context") }.firstOrNull()
         println("last context: "+lastContext)
         if (lastContext!=null) processContext(lastContext)
     }
@@ -32,41 +32,44 @@ class SlackBotRunner(
     @Scheduled(fixedRate = 3000)
     fun listenForCommands() {
         val command = slackService.getNewCommands() ?: ""
-        if (command.startsWith("context:")) {
+        if (command.startsWith("#context")) {
             log.info("Context opdracht ontvangen: $command")
             processContext(command)
             slackService.sendMessage("Context updated")
         }
-        if (command.startsWith("create_branch:")) {
+        else if (command.startsWith("#create_branch")) {
             log.info("Create branch opdracht ontvangen: $command")
             processCreateBranch(command)
         }
-        if (command.startsWith("code_review:")) {
+        else if (command.startsWith("#code_review")) {
             log.info("Nieuwe code review opdracht ontvangen: $command")
             processCodeReview(command)
         }
-        if (command.startsWith("question:")) {
+        else if (command.startsWith("#question")) {
             log.info("Question opdracht ontvangen: $command")
             processQuestion(command)
         }
-        if (command.startsWith("showcontext:")) {
+        else if (command.startsWith("#showcontext")) {
             log.info("Question opdracht ontvangen: $command")
             processShowContext(command)
         }
-        if (command.startsWith("help:")) {
+        else if (command.startsWith("#help")) {
             log.info("Question opdracht ontvangen: $command")
             processShowHelp(command)
         }
+//        else slackService.sendMessage("Unknown command, type '#help' for help")
+
     }
 
     private fun processShowHelp(command: String) {
         val message = """
             available commands:
-            context:
-            create_branch:
-            code_review:
-            showcontext:
-            help:
+            #question
+            #code_review:
+            #create_branch:
+            #context
+            #showcontext:
+            #help:
             
             Engines to choose from:
             OPEN_AI, OLLAMA
@@ -158,8 +161,7 @@ class SlackBotRunner(
             return
         }
         slackService.sendMessage("Working on question")
-        val details = parseCommand(command)
-        val question = details["question"] ?: "unknown"
+        val question = command.replace("#question","")
         val args = listOf("", lastContext!!.repo, lastContext!!.sourceFolder, lastContext!!.mainbranch, lastContext!!.featurebranch, lastContext!!.story, lastContext!!.engine, lastContext!!.model, question)
         try {
             val result = questionBot.run(args.toTypedArray())

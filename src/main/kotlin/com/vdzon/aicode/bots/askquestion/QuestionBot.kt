@@ -7,6 +7,7 @@ import com.vdzon.aicode.aiengine.AiEngineFactory
 import com.vdzon.aicode.aiengine.util.JsonSchemaHelper
 import com.vdzon.aicode.bots.AIBot
 import org.springframework.stereotype.Service
+import java.util.concurrent.TimeUnit
 
 @Service
 class QuestionBot(
@@ -43,10 +44,9 @@ class QuestionBot(
         val endTime = System.currentTimeMillis()
 
         val output = buildString {
-            append("Ai finished in: ${endTime - startTime} ms\n")
-            append("Engine: $engine}\n")
-            append("Model: ${model}\n\n")
-            append("Answer to question:\n")
+            val timeInSeconds = (endTime - startTime)/1000
+            append("Ai finished in: $timeInSeconds sec, using $engine : $model\n\n")
+            append("Answer::\n")
             append(aiResponse.answer)
         }
         println(output)

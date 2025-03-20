@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.util.concurrent.TimeUnit
 
 @Service
 class CodeGeneratorBot(val aiEngineFactory: AiEngineFactory
@@ -64,10 +65,9 @@ class CodeGeneratorBot(val aiEngineFactory: AiEngineFactory
 
 
         val output = buildString {
-            append("Ai finished in: ${endTime - startTime} ms\n")
-            append("Engine: $engine}\n")
-            append("Model: ${model}\n\n")
-            append("\nExplanation from AI:")
+            val timeInSeconds = (endTime - startTime)/1000
+            append("Ai finished in: $timeInSeconds sec, using $engine : $model\n\n")
+            append("\nExplanation:")
             append(aiResponse.explanationOfCodeChanges)
         }
         println(output)

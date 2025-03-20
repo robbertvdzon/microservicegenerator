@@ -7,6 +7,7 @@ import com.vdzon.aicode.aiengine.AiEngineFactory
 import com.vdzon.aicode.aiengine.util.JsonSchemaHelper
 import com.vdzon.aicode.bots.AIBot
 import org.springframework.stereotype.Service
+import java.util.concurrent.TimeUnit
 
 @Service
 class CodeReviewBot(val aiEngineFactory: AiEngineFactory
@@ -43,7 +44,8 @@ class CodeReviewBot(val aiEngineFactory: AiEngineFactory
         val endTime = System.currentTimeMillis()
 
         val output = buildString {
-            append("Ai finished in: ${endTime - startTime} ms\n\n")
+            val timeInSeconds = (endTime - startTime)/1000
+            append("Ai finished in: $timeInSeconds sec, using $engine : $model\n\n")
             append("Review response for each file:\n")
 
             aiResponse.filesWithComments?.forEach {
