@@ -1,6 +1,7 @@
 package com.vdzon.aicode.slackintegration
 
 import com.vdzon.aicode.bots.askquestion.QuestionBot
+import com.vdzon.aicode.bots.codegenerator.CodeGeneratorBot
 import com.vdzon.aicode.bots.codereview.CodeReviewBot
 import com.vdzon.aicode.bots.createbranch.CreateBranchBot
 import jakarta.annotation.PostConstruct
@@ -14,6 +15,7 @@ class SlackBotRunner(
     private val codeReviewBot: CodeReviewBot,
     private val createBranchBot: CreateBranchBot,
     private val questionBot: QuestionBot,
+    private val codeGeneratorBot: CodeGeneratorBot,
     ) {
 
     private val log = LoggerFactory.getLogger(SlackBotRunner::class.java)
@@ -45,6 +47,10 @@ class SlackBotRunner(
             log.info("Nieuwe code review opdracht ontvangen: $command")
             processCodeReview(command)
         }
+        else if (command.startsWith("#update_branch")) {
+            log.info("Nieuwe update branch opdracht ontvangen: $command")
+            processUpdateBranch(command)
+        }
         else if (command.startsWith("#question")) {
             log.info("Question opdracht ontvangen: $command")
             processQuestion(command)
@@ -65,11 +71,12 @@ class SlackBotRunner(
         val message = """
             available commands:
             #question
-            #code_review:
-            #create_branch:
+            #code_review
+            #update_branch
+            #create_branch
             #context
-            #showcontext:
-            #help:
+            #showcontext
+            #help
             
             Engines to choose from:
             OPEN_AI, OLLAMA
@@ -117,6 +124,24 @@ class SlackBotRunner(
         val args = listOf("", lastContext!!.repo, lastContext!!.sourceFolder, lastContext!!.mainbranch, lastContext!!.featurebranch, lastContext!!.story, lastContext!!.engine, lastContext!!.model, "")
         try {
             val result = codeReviewBot.run(args.toTypedArray())
+            slackService.sendMessage(result)
+        }
+        catch (e: Exception) {
+            slackService.sendMessage(e.message ?: "")
+        }
+    }
+
+
+    private fun processUpdateBranch(command: String) {
+        if (lastContext == null) {
+            slackService.sendMessage("No context")
+            return
+        }
+        slackService.sendMessage("Working on updating code")
+        val reviewComments = command.replace("#update_branch","")
+        val args = listOf("", lastContext!!.repo, lastContext!!.sourceFolder, lastContext!!.mainbranch, lastContext!!.featurebranch, lastContext!!.story, lastContext!!.engine, lastContext!!.model, reviewComments)
+        try {
+            val result = codeGeneratorBot.run(args.toTypedArray())
             slackService.sendMessage(result)
         }
         catch (e: Exception) {

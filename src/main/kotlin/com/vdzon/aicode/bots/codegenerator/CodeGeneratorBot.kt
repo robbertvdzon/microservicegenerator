@@ -40,7 +40,7 @@ class CodeGeneratorBot(val aiEngineFactory: AiEngineFactory
         println("calling AI model..")
 
         val startTime = System.currentTimeMillis()
-        val requestModel = Request(mainCode!!, branch!!, storyToImplement)
+        val requestModel = Request(mainCode!!, branch!!, storyToImplement, question)
         val requestJson = jacksonObjectMapper().writeValueAsString(requestModel)
         val jsonSchema: Map<String, Any> = JsonSchemaHelper.generateJsonSchemaAsMap(AiResponse::class.java)
         val jsonResponse = aiEngine.chat(jsonSchema, tokenGenerator.getSystemToken(), tokenGenerator.getUserToken(requestJson), model)

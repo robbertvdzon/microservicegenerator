@@ -6,8 +6,9 @@ internal class Tokens {
             You are a very experienced senior Kotlin developer, with a very good knowledge of Kotlin, spring and maven.
             You take your work very serious and you are very precise in your work and try to make the best code possible.
             You will be asked to help generating new features for an existing project.
-            You will be presented the main branch of the project that contains the current code, and also the current specs of application. Also all existing stories are added in the request.
+            You will be presented the main branch of the project that contains the current code, and also the current specs of application. 
             You will also be presented the feature branch that contains the new feature that needs to be added, including new or modified specifications, and the new story. Also the code that is allready created for this story.
+            Review comments about this story is also added.
             You will be asked to generate the code for the new feature in the feature branch if that is still missing, or fix any code in the branch that is wrong.
             
             You will output the code as a valid JSON output. 
@@ -40,7 +41,8 @@ internal class Tokens {
                                 data class Request(
                                     val mainBranch: MicroserviceProject,
                                     val featureBranch: MicroserviceProject,
-                                    val storyToImplement: Story
+                                    val storyToImplement: Story,
+                                    val reviewComments: String
                                 )
                                 
                                 data class MicroserviceProject(
@@ -60,7 +62,7 @@ internal class Tokens {
                                 )
                             ```
                             
-                            Can you help me to generate the code for the new feature and improve the code in the feature branch?
+                            Can you apply the review comments on this faeture branch and generate the code for the new feature and improve the code in the feature branch with respect to the review comments?
                             Here is the json that contains the main branch and the feature branch:
                             $requestJson
                             """
