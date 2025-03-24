@@ -6,11 +6,13 @@ import com.vdzon.aicode.aiengine.AiEngineFactory
 import com.vdzon.aicode.aiengine.util.JsonSchemaHelper
 import com.vdzon.aicode.bots.AIBot
 import com.vdzon.aicode.git.GithubService
+import com.vdzon.aicode.jiraintegration.JiraService
 import org.springframework.stereotype.Service
 
 @Service
 class CodeReviewBot(
-    val aiEngineFactory: AiEngineFactory
+    val aiEngineFactory: AiEngineFactory,
+    val jiraService: JiraService
 ) : AIBot {
     override fun getName(): String = "code_review"
     override fun getDescription(): String = "Code review a story"
@@ -30,7 +32,7 @@ class CodeReviewBot(
         val githubService = GithubService()
 
         println("\nStart code review..")
-        val storyToImplement = githubService.getTicket(repo, story)
+        val storyToImplement = jiraService.getJiraIssue(story)
         val mainCode = githubService.getSerializedRepo(repo, mainbranch, sourceFolder)
         val branch = githubService.getSerializedRepo(repo, featurebranch, sourceFolder)
         println("calling AI model..")
@@ -39,8 +41,10 @@ class CodeReviewBot(
         val requestModel = Request(mainCode!!, branch!!, storyToImplement)
         val requestJson = jacksonObjectMapper().writeValueAsString(requestModel)
         val jsonSchema: Map<String, Any> = JsonSchemaHelper.generateJsonSchemaAsMap(AiResponse::class.java)
-        val jsonResponse = aiEngine.chat(jsonSchema, tokenGenerator.getSystemToken(), tokenGenerator.getUserToken(requestJson), model)
-        val aiResponse: AiResponse = jacksonObjectMapper().readValue(jsonResponse, object : TypeReference<AiResponse>() {})
+        val jsonResponse =
+            aiEngine.chat(jsonSchema, tokenGenerator.getSystemToken(), tokenGenerator.getUserToken(requestJson), model)
+        val aiResponse: AiResponse =
+            jacksonObjectMapper().readValue(jsonResponse, object : TypeReference<AiResponse>() {})
         val endTime = System.currentTimeMillis()
 
         val output = buildString {

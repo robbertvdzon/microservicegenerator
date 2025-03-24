@@ -1,14 +1,10 @@
 package com.vdzon.aicode.git
 
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.vdzon.aicode.commonmodel.MicroserviceProject
 import com.vdzon.aicode.commonmodel.SourceFile
 import com.vdzon.aicode.commonmodel.SourceFileName
-import com.vdzon.aicode.commonmodel.Story
 import org.eclipse.jgit.api.Git
 import org.springframework.stereotype.Service
-import java.io.BufferedReader
 import java.io.File
 
 @Service
@@ -27,26 +23,6 @@ class GithubService() {
             return null
         }
     }
-
-    fun getTicket(repoUrl: String, ticket: String): Story {
-        val repoName = "git@github.com:robbertvdzon/sample-generated-ai-project" // TODO: Deze configureerbaar maken!
-        val command = listOf("gh", "issue", "view", ticket, "--repo", repoName, "--json", "title,body")
-
-        val process = ProcessBuilder(command)
-            .redirectErrorStream(true)
-            .start()
-
-        val output = process.inputStream.bufferedReader().use(BufferedReader::readText)
-        process.waitFor()
-
-        if (process.exitValue() != 0) {
-            throw RuntimeException("Error fetching ticket: $output")
-        }
-        val story = jacksonObjectMapper().readValue(output, object : TypeReference<Story>() {})
-        return story
-
-    }
-
 
     fun cloneAndListFiles(
         repoUrl: String,
@@ -85,7 +61,7 @@ class GithubService() {
         val localDir = File(localPath)
         localDir.deleteRecursively()
         println("Cloning $repoUrl into $localPath...")
-        val process = ProcessBuilder("git", "clone","--depth","1", "--branch", branch, repoUrl, localPath)
+        val process = ProcessBuilder("git", "clone", "--depth", "1", "--branch", branch, repoUrl, localPath)
             .redirectErrorStream(true)
             .start()
         process.inputStream.bufferedReader().use { it.readText() }

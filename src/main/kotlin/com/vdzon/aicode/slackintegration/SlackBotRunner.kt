@@ -1,6 +1,7 @@
 package com.vdzon.aicode.slackintegration
 
 import com.vdzon.aicode.bots.askquestion.QuestionBot
+import com.vdzon.aicode.bots.checkstory.CheckStoryBot
 import com.vdzon.aicode.bots.codegenerator.CodeGeneratorBot
 import com.vdzon.aicode.bots.codereview.CodeReviewBot
 import com.vdzon.aicode.bots.createbranch.CreateBranchBot
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component
 class SlackBotRunner(
     private val slackService: SlackService,
     private val codeReviewBot: CodeReviewBot,
+    private val checkStoryBot: CheckStoryBot,
     private val createBranchBot: CreateBranchBot,
     private val questionBot: QuestionBot,
     private val codeGeneratorBot: CodeGeneratorBot,
@@ -55,6 +57,10 @@ class SlackBotRunner(
             log.info("Question opdracht ontvangen: $command")
             processQuestion(command)
         }
+        else if (command.startsWith("#checkstory")) {
+            log.info("Check story  opdracht ontvangen: $command")
+            processCheckStory(command)
+        }
         else if (command.startsWith("#showcontext")) {
             log.info("Question opdracht ontvangen: $command")
             processShowContext(command)
@@ -74,6 +80,7 @@ class SlackBotRunner(
             #code_review
             #update_branch
             #create_branch
+            #checkstory
             #context
             #showcontext
             #help
@@ -194,6 +201,23 @@ class SlackBotRunner(
         val args = listOf("", lastContext!!.repo, lastContext!!.sourceFolder, lastContext!!.mainbranch, lastContext!!.featurebranch, lastContext!!.story, lastContext!!.engine, lastContext!!.model, question)
         try {
             val result = questionBot.run(args.toTypedArray())
+            slackService.sendMessage(result)
+        }
+        catch (e: Exception) {
+            e.printStackTrace()
+            slackService.sendMessage("Exception during process:"+e.message ?: "")
+        }
+    }
+
+    private fun processCheckStory(command: String) {
+        if (lastContext == null) {
+            slackService.sendMessage("No context")
+            return
+        }
+        slackService.sendMessage("Working on checking story")
+        val args = listOf("", lastContext!!.repo, lastContext!!.sourceFolder, lastContext!!.mainbranch, lastContext!!.featurebranch, lastContext!!.story, lastContext!!.engine, lastContext!!.model, "")
+        try {
+            val result = checkStoryBot.run(args.toTypedArray())
             slackService.sendMessage(result)
         }
         catch (e: Exception) {

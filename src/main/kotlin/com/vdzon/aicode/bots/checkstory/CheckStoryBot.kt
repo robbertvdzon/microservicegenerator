@@ -2,20 +2,23 @@ package com.vdzon.aicode.bots.checkstory
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.vdzon.aicode.git.GithubService
 import com.vdzon.aicode.aiengine.AiEngineFactory
 import com.vdzon.aicode.aiengine.util.JsonSchemaHelper
 import com.vdzon.aicode.bots.AIBot
+import com.vdzon.aicode.git.GithubService
+import com.vdzon.aicode.jiraintegration.JiraService
 import org.springframework.stereotype.Service
-import java.util.concurrent.TimeUnit
 
 @Service
-class CheckStoryBot(val aiEngineFactory: AiEngineFactory): AIBot {
+class CheckStoryBot(
+    val aiEngineFactory: AiEngineFactory,
+    val jiraService: JiraService
+) : AIBot {
 
     override fun getName(): String = "check_story"
     override fun getDescription(): String = "Check the story"
     override fun getHelp(): String = "check_story githubrepo mainbranch story engine model"
-    override fun run(args: Array<String>): String{
+    override fun run(args: Array<String>): String {
         val repo = args.getOrNull(1) ?: throw RuntimeException("Invalid repo")
         val sourceFolder = args.getOrNull(2) ?: throw RuntimeException("Invalid sourceFolder")
         val mainbranch = args.getOrNull(3) ?: throw RuntimeException("Invalid main branch")
@@ -26,11 +29,11 @@ class CheckStoryBot(val aiEngineFactory: AiEngineFactory): AIBot {
         val question = args.getOrNull(8) ?: throw RuntimeException("Invalid question")
 
         val tokenGenerator = Tokens()
-        val aiEngine= aiEngineFactory.getAiEngine(engine, repo)
-        val githubService =  GithubService()
+        val aiEngine = aiEngineFactory.getAiEngine(engine, repo)
+        val githubService = GithubService()
 
         println("\nStart generating code..")
-        val storyToImplement = githubService.getTicket(repo, story)
+        val storyToImplement = jiraService.getJiraIssue(story)
         println("Story to implement: ${storyToImplement.title}")
         println("${storyToImplement.body}")
         val mainCode = githubService.getSerializedRepo(repo, mainbranch, sourceFolder)
@@ -40,13 +43,15 @@ class CheckStoryBot(val aiEngineFactory: AiEngineFactory): AIBot {
         val requestModel = CheckStoryRequest(mainCode!!, storyToImplement)
         val requestJson = jacksonObjectMapper().writeValueAsString(requestModel)
         val jsonSchema: Map<String, Any> = JsonSchemaHelper.generateJsonSchemaAsMap(CheckStoryAiResponse::class.java)
-        val jsonResponse = aiEngine.chat(jsonSchema, tokenGenerator.getSystemToken(), tokenGenerator.getUserToken(requestJson), model)
-        val aiResponse: CheckStoryAiResponse = jacksonObjectMapper().readValue(jsonResponse,object : TypeReference<CheckStoryAiResponse>() {})
+        val jsonResponse =
+            aiEngine.chat(jsonSchema, tokenGenerator.getSystemToken(), tokenGenerator.getUserToken(requestJson), model)
+        val aiResponse: CheckStoryAiResponse =
+            jacksonObjectMapper().readValue(jsonResponse, object : TypeReference<CheckStoryAiResponse>() {})
 
         val endTime = System.currentTimeMillis()
 
         val output = buildString {
-            val timeInSeconds = (endTime - startTime)/1000
+            val timeInSeconds = (endTime - startTime) / 1000
             append("Ai finished in: $timeInSeconds sec, using $engine : $model\n\n")
             append("\nComments about story: ")
             append(aiResponse.commentsAboutStory)
