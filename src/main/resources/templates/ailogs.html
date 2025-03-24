@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Logs</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 8px; border: 1px solid #ddd; }
+        th { background-color: #f2f2f2; }
+    </style>
+    <script>
+        async function getAILogs() {
+            const response = await fetch('/api/ailogs');
+            const logs = await response.json();
+            let tableContent = '<table><tr><th>Time</th><th>Request</th><th>Response</th></tr>';
+            logs.forEach(log => {
+                const date = new Date(log.timestamp); 
+                tableContent += `<tr><td>${date}</td><td>${log.request}</td><td>${log.response}</td></tr>`;
+            });
+            tableContent += '</table>';
+            document.getElementById('ailogstable').innerHTML = tableContent;
+        }
+
+        window.onload = function() {
+            getAILogs();
+        };
+    </script>
+</head>
+<body>
+    <h2>AI Request and Response Logs</h2>
+    <div id="ailogstable"></div>
+</body>
+</html>
