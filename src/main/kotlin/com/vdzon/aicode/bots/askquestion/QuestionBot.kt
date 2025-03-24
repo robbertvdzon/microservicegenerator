@@ -27,7 +27,7 @@ class QuestionBot(
         val question = args.getOrNull(8) ?: throw RuntimeException("Invalid question")
 
         val tokenGenerator = Tokens()
-        val aiEngine= aiEngineFactory.getAiEngine(engine)
+        val aiEngine= aiEngineFactory.getAiEngine(engine, repo)
         val githubService =  GithubService()
 
         println("\nStart code review..")

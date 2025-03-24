@@ -9,7 +9,8 @@ class AiEngineFactory(
     private val openAiEngine: OpenAiEngine,
     private val ollamaEngine: OllamaEngine
 ) {
-    fun getAiEngine(engine: String): AIEngine {
+    fun getAiEngine(engine: String, repo: String): AIEngine {
+        if (repo.contains("gitlab.com:EDSN") && engine=="OPEN_AI") throw IllegalArgumentException("OpenAI is not allowed for gitlab")
         return when (engine) {
             "OPEN_AI" -> openAiEngine
             "OLLAMA" -> ollamaEngine

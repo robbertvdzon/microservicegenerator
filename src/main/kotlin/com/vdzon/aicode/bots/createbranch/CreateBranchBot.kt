@@ -30,7 +30,7 @@ class CreateBranchBot(val aiEngineFactory: AiEngineFactory
         val question = args.getOrNull(8) ?: throw RuntimeException("Invalid question")
 
         val tokenGenerator = Tokens()
-        val aiEngine= aiEngineFactory.getAiEngine(engine)
+        val aiEngine= aiEngineFactory.getAiEngine(engine, repo)
         val githubService =  GithubService()
 
         println("\nStart generating code..")

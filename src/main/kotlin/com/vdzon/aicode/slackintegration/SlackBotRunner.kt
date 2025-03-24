@@ -155,6 +155,7 @@ class SlackBotRunner(
     private fun processContext(command: String) {
         val details = parseCommand(command)
         val repo = details["repo"] ?: "unknown"
+        val repoFixed = repo.replace("<mailto:git@gitlab.com|git@gitlab.com>","git@gitlab.com") // slack is adding mailto automatically
         val sourceFolder = details["sourceFolder"] ?: "unknown"
         val mainbranch = details["mainbranch"] ?: "unknown"
         val featurebranch = details["featurebranch"] ?: "unknown"
@@ -162,7 +163,7 @@ class SlackBotRunner(
         val engine = details["engine"] ?: "unknown"
         val model = details["model"] ?: "unknown"
         lastContext = Context(
-            repo, sourceFolder, mainbranch, featurebranch, story, engine, model
+            repoFixed, sourceFolder, mainbranch, featurebranch, story, engine, model
         )
     }
 
