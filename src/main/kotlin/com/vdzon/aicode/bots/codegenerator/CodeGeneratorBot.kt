@@ -83,7 +83,9 @@ class CodeGeneratorBot(val aiEngineFactory: AiEngineFactory
         for (file in sourceFiles) {
             val filePath = "$basePath/${file.sourceFilename.path}/${file.sourceFilename.filename}".replace("//","/")
             println("Saving : $filePath")
-            Files.createDirectories(Paths.get("$basePath/${file.sourceFilename.path}"))
+            val parentFolder = Paths.get("$basePath/${file.sourceFilename.path}")
+            println("Create folder if needed : ${parentFolder}")
+            Files.createDirectories(parentFolder)
             File(filePath).writeText(file.body)
             println("Bestand opgeslagen: $filePath")
         }

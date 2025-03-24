@@ -127,7 +127,8 @@ class SlackBotRunner(
             slackService.sendMessage(result)
         }
         catch (e: Exception) {
-            slackService.sendMessage(e.message ?: "")
+            e.printStackTrace()
+            slackService.sendMessage("Exception during process:"+e.message ?: "")
         }
     }
 
@@ -145,7 +146,8 @@ class SlackBotRunner(
             slackService.sendMessage(result)
         }
         catch (e: Exception) {
-            slackService.sendMessage(e.message ?: "")
+            e.printStackTrace()
+            slackService.sendMessage("Exception during process:"+e.message ?: "")
         }
     }
 
@@ -176,7 +178,8 @@ class SlackBotRunner(
             slackService.sendMessage(result)
         }
         catch (e: Exception) {
-            slackService.sendMessage(e.message ?: "")
+            e.printStackTrace()
+            slackService.sendMessage("Exception during process:"+e.message ?: "")
         }
     }
 
@@ -193,7 +196,8 @@ class SlackBotRunner(
             slackService.sendMessage(result)
         }
         catch (e: Exception) {
-            slackService.sendMessage(e.message ?: "")
+            e.printStackTrace()
+            slackService.sendMessage("Exception during process:"+e.message ?: "")
         }
     }
 
