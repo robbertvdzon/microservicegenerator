@@ -36,36 +36,36 @@ class SlackBotRunner(
     @Scheduled(fixedRate = 3000)
     fun listenForCommands() {
         val command = slackService.getNewCommands() ?: ""
-        if (command.startsWith("#context")) {
+        if (command.startsWith("#context") || command.startsWith("context")) {
             log.info("Context opdracht ontvangen: $command")
             processContext(command)
             slackService.sendMessage("Context updated")
         }
-        else if (command.startsWith("#create_branch")) {
+        else if (command.startsWith("#create_branch") || command.startsWith("implement story")) {
             log.info("Create branch opdracht ontvangen: $command")
             processCreateBranch(command)
         }
-        else if (command.startsWith("#code_review")) {
+        else if (command.startsWith("#code_review") || command.startsWith("review code")) {
             log.info("Nieuwe code review opdracht ontvangen: $command")
             processCodeReview(command)
         }
-        else if (command.startsWith("#update_branch")) {
+        else if (command.startsWith("#update_branch") || command.startsWith("update code")) {
             log.info("Nieuwe update branch opdracht ontvangen: $command")
             processUpdateBranch(command)
         }
-        else if (command.startsWith("#question")) {
+        else if (command.startsWith("#question")||command.startsWith("question")) {
             log.info("Question opdracht ontvangen: $command")
             processQuestion(command)
         }
-        else if (command.startsWith("#checkstory")) {
+        else if (command.startsWith("#checkstory")||command.startsWith("check story")) {
             log.info("Check story  opdracht ontvangen: $command")
             processCheckStory(command)
         }
-        else if (command.startsWith("#showcontext")) {
+        else if (command.startsWith("#showcontext")||command.startsWith("show context")) {
             log.info("Question opdracht ontvangen: $command")
             processShowContext(command)
         }
-        else if (command.startsWith("#help")) {
+        else if (command.startsWith("#help")||command.startsWith("help")) {
             log.info("Question opdracht ontvangen: $command")
             processShowHelp(command)
         }
@@ -76,14 +76,14 @@ class SlackBotRunner(
     private fun processShowHelp(command: String) {
         val message = """
             available commands:
-            #question
-            #code_review
-            #update_branch
-            #create_branch
-            #checkstory
-            #context
-            #showcontext
-            #help
+            question (or #question) to ask a question about the main branch of te code
+            review code (or #code_review) to review the code for the specified story
+            update code (or #update_branch) to ask for an update of the code, give feedback on the next lines
+            implement story (or #create_branch) to ask to create the branch for the story with an implementation
+            check story (#checkstory) to ask if the story is clear 
+            show context (or #showcontext) to ask the current selected repo, branch, story etc
+            help (or #help) to show this help
+            context (or #context) to set the context (can be copied/pastes from the show context command)
             
             Engines to choose from:
             OPEN_AI, OLLAMA

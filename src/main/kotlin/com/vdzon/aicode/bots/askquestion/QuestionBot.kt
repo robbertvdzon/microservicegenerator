@@ -30,13 +30,12 @@ class QuestionBot(
         val aiEngine= aiEngineFactory.getAiEngine(engine, repo)
         val githubService =  GithubService()
 
-        println("\nStart code review..")
+        println("\nStart processing question..")
         val mainCode = githubService.getSerializedRepo(repo, mainbranch, sourceFolder)
-        val branch = githubService.getSerializedRepo(repo, featurebranch, sourceFolder)
         println("calling AI model..")
 
         val startTime = System.currentTimeMillis()
-        val requestModel = Request(mainCode!!, branch!!, question)
+        val requestModel = Request(mainCode!!, question)
         val requestJson = jacksonObjectMapper().writeValueAsString(requestModel)
         val jsonSchema: Map<String, Any> = JsonSchemaHelper.generateJsonSchemaAsMap(AiResponse::class.java)
         val jsonResponse = aiEngine.chat(jsonSchema, tokenGenerator.getSystemToken(), tokenGenerator.getUserToken(requestJson), model)
@@ -46,7 +45,7 @@ class QuestionBot(
         val output = buildString {
             val timeInSeconds = (endTime - startTime)/1000
             append("Ai finished in: $timeInSeconds sec, using $engine : $model\n\n")
-            append("Answer::\n")
+            append("Answer:\n")
             append(aiResponse.answer)
         }
         println(output)
