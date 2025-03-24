@@ -69,7 +69,8 @@ class CreateBranchBot(val aiEngineFactory: AiEngineFactory
         githubService.pushToNewRemoteBranch("/tmp/ai-repo", featurebranch)
 
         val output = buildString {
-            append("Ai finished in: ${endTime - startTime} ms\n")
+            val timeInSeconds = (endTime - startTime)/1000
+            append("Ai finished in: $timeInSeconds sec, using $engine : $model\n\n")
             append("Engine: $engine}\n")
             append("Model: ${model}\n\n")
             append("\nExplanation from AI:")

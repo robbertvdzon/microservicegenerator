@@ -103,7 +103,7 @@ class SlackBotRunner(
         val message = """
             current context:
             
-            context:
+            #context:
             repo: ${lastContext?.repo}
             sourceFolder: ${lastContext?.sourceFolder}
             mainbranch: ${lastContext?.mainbranch}
